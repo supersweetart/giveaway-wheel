@@ -165,6 +165,7 @@
   @keyframes pop{from{transform:scale(.86) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
 
   .dial{position:relative;width:min(100%,620px);aspect-ratio:1}
+  .dial.empty canvas{cursor:pointer}
   .dial canvas{width:100%;height:100%;display:block;
     filter:drop-shadow(0 16px 26px rgba(59,35,64,.16));}
   .hub{
@@ -422,15 +423,15 @@
 
   <header class="masthead">
     <div class="lockup">
-      <div class="eyebrow" id="eyebrow">2,000 followers · thank you</div>
+      <div class="eyebrow" id="eyebrow">giveaway draws</div>
       <h1>Super Sweet <em>Art</em></h1>
-      <div class="subline" id="subline">@supersweetbyqiao — September Sweet Mail giveaway</div>
+      <div class="subline" id="subline">@supersweetbyqiao — drop in a comment export to begin</div>
     </div>
     <div class="rightcol">
       <div class="facts">
-        <div class="fact"><b id="fEntries">267</b><span>Entries</span></div>
-        <div class="fact"><b id="fEntrants">83</b><span>Entrants</span></div>
-        <div class="fact"><b id="fWinners">3</b><span>Winners</span></div>
+        <div class="fact"><b id="fEntries">—</b><span>Entries</span></div>
+        <div class="fact"><b id="fEntrants">—</b><span>Entrants</span></div>
+        <div class="fact"><b id="fWinners">—</b><span>Winners</span></div>
       </div>
       <button class="mini solid" id="importBtn">Import a CSV</button>
     </div>
@@ -440,7 +441,7 @@
 
     <div class="wheelwrap">
       <div class="banner" id="banner" aria-live="polite">
-        <span class="msg">Ready — 83 entrants, 267 entries in the drum</span>
+        <span class="msg">No draw loaded — import a CSV to fill the wheel</span>
       </div>
       <div class="dial">
         <canvas id="wheel" aria-label="Giveaway wheel, one slice per entrant sized by their number of entries"></canvas>
@@ -450,25 +451,26 @@
           <circle cx="22" cy="21" r="6.5" fill="#FFF6F2" stroke="#3B2340" stroke-width="2.5"/>
         </svg>
         <div class="hub" id="hub">
-          <span class="lab" id="hublab">Draw</span>
-          <span class="num" id="hubnum">1<span style="font-size:.5em">/3</span></span>
+          <span class="lab" id="hublab">Waiting for</span>
+          <span class="num" id="hubnum">CSV</span>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <button class="spin" id="spinBtn">Spin the wheel</button>
-      <div class="hint">or press the space bar</div>
+      <button class="spin" id="spinBtn" disabled>Import a CSV first</button>
+      <div class="hint" id="spinHint" hidden>or press the space bar</div>
 
       <div class="slots">
-        <h2 id="slotsTitle">September Sweet Mail — winners</h2>
+        <h2 id="slotsTitle">Winners</h2>
         <div id="stamps" class="stampstack"></div>
       </div>
 
       <div class="minis">
+        <button class="mini" id="sampleBtn">Load the saved draw</button>
         <button class="mini" id="soundBtn" aria-pressed="true">Sound on</button>
-        <button class="mini" id="resetBtn">Reset draw</button>
-        <button class="mini" id="dlBtn">Download redacted CSV</button>
+        <button class="mini" id="resetBtn" disabled>Reset draw</button>
+        <button class="mini" id="dlBtn" disabled>Download redacted CSV</button>
       </div>
     </div>
   </div>
@@ -476,7 +478,7 @@
   <section class="pool">
     <div class="pool-head">
       <h2>The entry pool</h2>
-      <p>Each comment is one entry, so a wider slice means more comments. Names are struck through once that account has been drawn.</p>
+      <p id="poolLede">Nothing loaded yet. Import a comment export and every entrant appears here with the number of entries they earned.</p>
     </div>
     <div class="grid" id="grid"></div>
     <p class="fineprint" id="fineprint"></p>
@@ -604,6 +606,28 @@
       ctx.beginPath();
       ctx.arc(cx + Math.cos(ang)*(R+6.7), cy + Math.sin(ang)*(R+6.7), 1.5, 0, Math.PI*2);
       ctx.fillStyle = INK; ctx.globalAlpha = .5; ctx.fill(); ctx.globalAlpha = 1;
+    }
+
+    if(!segs.length || buildT !== null){
+      /* The ghost wheel: what the page shows while it waits for a file, and
+         what the wedges fill into as they are placed — without it the build
+         reads as a broken wheel rather than one being loaded. */
+      ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+      ctx.fillStyle = "#FBEFF4"; ctx.fill();
+      ctx.save();
+      ctx.strokeStyle = "rgba(59,35,64,.20)";
+      ctx.lineWidth = 1.3;
+      ctx.setLineDash([5,7]);
+      for(var k=0;k<18;k++){
+        var ga = k/18*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(ga)*hubR, cy + Math.sin(ga)*hubR);
+        ctx.lineTo(cx + Math.cos(ga)*R,    cy + Math.sin(ga)*R);
+        ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(cx,cy,R*0.66,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
+      if(!segs.length) return;
     }
 
     var n = segs.length;
@@ -859,14 +883,17 @@
           '</svg></div>';
       } else {
         html += '<div class="stamp empty"><div class="inner"><div class="no">' + (i+1) + '</div>' +
-          '<div class="who"><span class="name">awaiting the spin</span>' +
-          '<span class="meta">winner ' + (i+1) + ' of ' + totalWinners + '</span></div></div></div>';
+          '<div class="who"><span class="name">' +
+          (ALL.length ? "awaiting the spin" : "no draw loaded") + '</span>' +
+          '<span class="meta">' + (ALL.length ? "winner " + (i+1) + " of " + totalWinners
+                                              : "import a csv") + '</span></div></div></div>';
       }
     }
     stampsEl.innerHTML = html;
   }
 
   function renderGrid(){
+    if(!ALL.length){ gridEl.innerHTML = ""; return; }
     var won = {}, live = {}, i;
     for(i=0;i<winners.length;i++) won[winners[i].u] = true;
     for(i=0;i<pool.length;i++) live[pool[i].u] = true;
@@ -882,12 +909,22 @@
   }
 
   function renderFacts(){
-    $("fEntries").textContent = entryTotal(ALL);
-    $("fEntrants").textContent = ALL.length;
-    $("fWinners").textContent = totalWinners;
+    var em = "—";
+    $("fEntries").textContent  = ALL.length ? entryTotal(ALL) : em;
+    $("fEntrants").textContent = ALL.length ? ALL.length : em;
+    $("fWinners").textContent  = ALL.length ? totalWinners : em;
   }
 
   function renderFineprint(){
+    if(!ALL.length){
+      $("fineprint").innerHTML =
+        "<b>How a draw works.</b> Every entrant gets one slice, sized by the number of entries " +
+        "they earned, so the wheel is a picture of the odds. The winner is chosen first by the " +
+        "browser’s cryptographic random number generator, weighted by those counts; the wheel " +
+        "then spins to that result. A winner leaves the pool before the next spin, so no one " +
+        "can be drawn twice. Nothing you import leaves your browser.";
+      return;
+    }
     $("fineprint").innerHTML =
       "<b>How this draw works.</b> " + esc(noteText) + " Each winner is chosen first by the browser’s " +
       "cryptographic random number generator, weighted by entry count; the wheel then spins to that result. " +
@@ -895,6 +932,11 @@
   }
 
   function updateHub(){
+    if(!ALL.length){
+      hublab.textContent = "Waiting for";
+      hubnum.textContent = "CSV";
+      return;
+    }
     if(building){ hublab.textContent = "Loading"; return; }
     if(winners.length >= totalWinners){
       hublab.textContent = "Done";
@@ -906,12 +948,32 @@
   }
 
   function readyMsg(){
+    if(!ALL.length){ msg("No draw loaded — import a CSV to fill the wheel"); return; }
     msg("Ready — " + ALL.length + " entrants, " + entryTotal(ALL) + " entries in the drum");
+  }
+
+  /* Which controls make sense depends on whether a draw is loaded at all. */
+  function syncControls(){
+    var has = ALL.length > 0;
+    cv.parentNode.classList.toggle("empty", !has);
+    $("spinHint").hidden = !has;
+    $("resetBtn").disabled = !has;
+    $("dlBtn").disabled = !has;
+    if(!has){
+      spinBtn.disabled = true;
+      spinBtn.textContent = "Import a CSV first";
+      $("poolLede").textContent = "Nothing loaded yet. Import a comment export and every " +
+        "entrant appears here with the number of entries they earned.";
+    } else {
+      if(!spinning && !building && winners.length < totalWinners) spinBtn.disabled = false;
+      $("poolLede").textContent = "Each entry is one slice of the drum, so a wider slice means " +
+        "better odds. Names are struck through once that account has been drawn.";
+    }
   }
 
   /* ================= build-in animation ================= */
   function playBuild(then){
-    if(reduced){ buildT = null; paint(); if(then) then(); return; }
+    if(reduced){ buildT = null; building = false; paint(); syncControls(); if(then) then(); return; }
     building = true;
     buildT = 0;
     spinBtn.disabled = true;
@@ -930,8 +992,7 @@
       if(t < 1) requestAnimationFrame(frame);
       else {
         buildT = null; building = false;
-        spinBtn.disabled = false;
-        updateHub(); paint();
+        updateHub(); paint(); syncControls();
         if(then) then();
       }
     }
@@ -1024,13 +1085,13 @@
             winners.map(function(w){ return "@" + esc(w.u); }).join(" · ") + '</b></span>');
       }, 2600);
     } else {
-      spinBtn.disabled = false;
       spinBtn.textContent = "Spin for winner " + (winners.length + 1);
+      syncControls();
     }
   }
 
   function resetDraw(){
-    if(spinning || building) return;
+    if(spinning || building || !ALL.length) return;
     pool = ALL.slice();
     winners = []; pendingRemoval = null; highlight = null;
     segs = slices();
@@ -1233,6 +1294,7 @@
   }
 
   $("dlBtn").addEventListener("click", function(){
+    if(!ALL.length) return;
     var r = redacted || seedRedacted();
     offer("entrants.csv", r.entrants).then(function(res){
       /* only one save prompt may be open at a time, so chain the second */
@@ -1271,6 +1333,7 @@
         '<div class="actions">' +
           '<button class="go" id="goBtn" disabled>Build the wheel</button>' +
           '<button class="mini" id="cancelBtn">Cancel</button>' +
+          '<button class="mini" id="savedBtn">Load the saved draw</button>' +
           '<span class="note" id="sheetNote">Needs a column of usernames. A <code>type</code> ' +
             'column lets replies be filtered out; a tags or comment column lets the @-mention ' +
             'rules apply.</span>' +
@@ -1300,6 +1363,7 @@
     });
 
     veil.querySelector("#cancelBtn").addEventListener("click", closeSheet);
+    veil.querySelector("#savedBtn").addEventListener("click", loadSaved);
     veil.addEventListener("mousedown", function(e){ if(e.target === veil) closeSheet(); });
     document.addEventListener("keydown", escClose);
     veil.querySelector("#goBtn").addEventListener("click", commitImport);
@@ -1446,7 +1510,7 @@
     load(r.entrants, opts.winners);
     closeSheet();
 
-    renderFacts(); renderStamps(); renderGrid(); renderFineprint();
+    renderFacts(); renderStamps(); renderGrid(); renderFineprint(); syncControls();
     spinBtn.textContent = "Spin the wheel";
     msg("Sticking " + ALL.length + " names to the wheel…");
     playBuild(function(){
@@ -1454,6 +1518,28 @@
       toast("Wheel rebuilt from " + fname);
     });
   }
+
+  /* The published draw is kept as data but not shown until asked for, so the
+     page opens empty and the September record is still one click away. */
+  function loadSaved(){
+    if(spinning || building) return;
+    if(veil) closeSheet();
+    $("eyebrow").textContent = SEED.eyebrow;
+    $("subline").textContent = SEED.subline;
+    $("slotsTitle").textContent = SEED.slots;
+    noteText = SEED.note;
+    redacted = null;
+    load(SEED.entrants, SEED.winners);
+    renderFacts(); renderStamps(); renderGrid(); renderFineprint(); syncControls();
+    spinBtn.textContent = "Spin the wheel";
+    msg("Sticking " + ALL.length + " names to the wheel…");
+    playBuild(readyMsg);
+  }
+  $("sampleBtn").addEventListener("click", loadSaved);
+
+  cv.addEventListener("click", function(){
+    if(!ALL.length && !veil && !building) openSheet();
+  });
 
   $("importBtn").addEventListener("click", function(){
     if(spinning || building) return;
@@ -1485,12 +1571,9 @@
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
 
   /* ================= boot ================= */
-  $("eyebrow").textContent = SEED.eyebrow;
-  $("subline").textContent = SEED.subline;
-  $("slotsTitle").textContent = SEED.slots;
-  load(SEED.entrants, SEED.winners);
+  ALL = []; pool = []; segs = []; winners = []; pendingRemoval = null; highlight = null;
   renderFacts(); renderStamps(); renderGrid(); renderFineprint();
-  readyMsg(); updateHub(); paint();
+  readyMsg(); syncControls(); updateHub(); paint();
 })();
 </script>
 </body>

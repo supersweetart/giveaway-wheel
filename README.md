@@ -8,11 +8,23 @@ Built for the [@supersweetbyqiao](https://www.instagram.com/supersweetbyqiao/) 2
 giveaway (September Sweet Mail subscriptions). One slice per entrant, sized by how many
 entries that account earned — so the wheel is a picture of the odds, not just decoration.
 
+## Opening state
+
+The page opens with an **empty wheel** — a ghost of the rim waiting for a file. Nothing is
+loaded until you choose:
+
+- **Import a CSV** (top right, or click the empty wheel) — read a comment export and build
+  the wheel from it.
+- **Load the saved draw** — bring back the draw published in this repo, so the September
+  record stays one click away.
+
+Either way the names fly out of the hub and stick to their wedges as the wheel fills.
+
 ## Running the draw
 
 | | |
 |---|---|
-| **Spin** | Click **Spin the wheel**, or press the **space bar** (cleaner on camera — no cursor in frame) |
+| **Spin** | Click **Spin the wheel**, or press the **space bar** (cleaner on camera — no cursor in frame). Both stay disabled until a draw is loaded |
 | **Length** | ~7 seconds. The pointer sound is synthesised as a rubber flapper hitting wooden pegs: a filtered noise slap plus a short damped tone, randomised per peg and fading as the wheel loses speed |
 | **Landing** | The winning wedge lifts and brightens, the rest dim, the handle appears above the wheel and a postmark drops onto the stamp slot |
 | **Next** | The winner leaves the pool; spin again |
@@ -45,7 +57,7 @@ their wedges.
 
 The file is read locally and never uploaded. **Download redacted CSV** gives you the
 cleaned data (and copies it to your clipboard, since some embedded viewers block downloads).
-This route does not change what is deployed — reload and you are back to the published draw.
+This route does not change what is deployed — reload and the wheel is empty again.
 
 ### On your machine — for publishing
 
@@ -54,8 +66,11 @@ python3 tools/publish-draw.py my_export.csv --push
 ```
 
 That one command redacts the export, writes both files in `data/`, rewrites the wheel's
-built-in dataset and masthead inside `index.html`, then commits and pushes. GitHub Pages
+saved dataset and masthead inside `index.html`, then commits and pushes. GitHub Pages
 rebuilds a minute later. Drop `--push` to review the changes first.
+
+The saved dataset is what **Load the saved draw** restores — the page still opens empty.
+Publishing a draw therefore changes the public record, not the opening screen.
 
 Useful flags: `--winners 5`, `--host someaccount`, `--deadline "Closes 30 Sept 11:59 PM PT"`,
 `--eyebrow` / `--subline` / `--slots` for the masthead wording, and `--keep-replies`,
