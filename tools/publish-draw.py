@@ -192,7 +192,7 @@ def main():
     ap.add_argument("--winners", type=int, default=3)
     ap.add_argument("--host", default="supersweetbyqiao", help="host account to ignore")
     ap.add_argument("--eyebrow", default="new draw")
-    ap.add_argument("--subline", default="@supersweetbyqiao — giveaway")
+    ap.add_argument("--subline", default="supersweetstudio.ca — giveaway")
     ap.add_argument("--slots", default="Winners")
     ap.add_argument("--deadline", default="", help="deadline sentence for the fine print")
     ap.add_argument("--keep-replies", dest="top_level_only", action="store_false",

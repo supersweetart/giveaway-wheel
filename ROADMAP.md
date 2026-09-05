@@ -21,22 +21,21 @@ Shipped and live at https://supersweetart.github.io/giveaway-wheel/
 - [x] Redacted export (download, with host-save and clipboard fallbacks)
 - [x] `tools/publish-draw.py` — redact, rewrite, commit, push in one command
 - [x] Published to GitHub Pages; raw exports git-ignored
+- [x] Brand mark in the hub when the wheel is empty
+- [x] Warm palette built from the mark's own colours — yellow `#F9C318`, red `#D83A26`,
+      blush `#FDD4CC` — replacing the placeholder pink/plum scheme
 
-**One thing still unverified in a real browser:** after the build animation completes, the
-Spin button should return to its enabled pink state. Headless Chrome couldn't test this
-(its virtual clock starves animation frames). The equivalent code path was verified on the
-reduced-motion route. Click **Load the saved draw** once and confirm.
+**One thing still unverified in a real browser:** after the build *animation* completes, the
+Spin button should return to its enabled yellow state. Headless Chrome cannot test that path
+— its virtual clock starves animation frames. The reduced-motion route, which ends through
+the same `syncControls()` call, was confirmed. Click **Load the saved draw** once with motion
+on and check the button turns yellow.
 
 ---
 
 ## Next up
 
 The three that stand between this and "another artist can use it".
-
-- [ ] **Brand logo in the hub when empty** — **S**
-      Replace the "waiting for / CSV" text with the artist's mark. Needs a decision on how
-      the logo gets in: an image the artist uploads (stored where?), or an SVG in the repo.
-      Simplest first cut: an `img` in the repo referenced by a config value.
 
 - [ ] **Import by pasting a post link** — **L**
       Paste an Instagram / YouTube / TikTok URL instead of exporting a CSV. This is the
@@ -47,10 +46,12 @@ The three that stand between this and "another artist can use it".
       see *Open questions* below.
 
 - [ ] **Make the branding configurable** — **M**
-      Right now the artist's name, the host handle default (`supersweetbyqiao`), the
-      masthead wording and the palette are baked into `index.html`. Pull them into one
+      The artist's name, the host handle default (`supersweetbyqiao`), the masthead wording,
+      the palette and now the hub mark are all baked into `index.html`. Pull them into one
       config object at the top of the file, then a small settings panel that writes to
       `localStorage`. Until this exists, every other artist has to fork and hand-edit.
+      The mark is embedded as a base64 data URI so it survives anywhere the page is served —
+      an artist swapping it currently has to re-encode their own PNG.
 
 ---
 
@@ -58,8 +59,9 @@ The three that stand between this and "another artist can use it".
 
 ### Making it shareable
 
-- [ ] **Palette per artist** — **M**. The candy palette is Super Sweet Art's. Let an artist
-      pick an accent and derive the wheel colours from it, or choose from a few sets.
+- [ ] **Palette per artist** — **M**. The palette is now derived from Super Sweet Art's mark.
+      Let an artist drop in their logo and pull the accent — and ideally the wheel colours —
+      out of it automatically, the way this one was sampled by hand.
 - [ ] **A "your first draw" walkthrough** — **S**. First-time visitors see an empty wheel
       and two buttons with no explanation of what file to bring.
 - [ ] **Draw history** — **M**. Every publish overwrites the saved draw. Past draws should

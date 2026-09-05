@@ -120,5 +120,10 @@ This repo is public because GitHub Pages needs it to be on a free account.
 No build step and no dependencies; Google Fonts is the only external request. Everything —
 markup, styles, wheel rendering, CSV parsing, audio synthesis — is in `index.html`.
 
+The palette is sampled from the Super Sweet Art mark — yellow `#F9C318`, red `#D83A26`,
+blush `#FDD4CC` — and the mark itself sits in the hub whenever the wheel is empty. It is
+embedded as a base64 data URI in `index.html` (and kept as `assets/logo.png` for the
+favicon), so the page carries its own artwork wherever it is served.
+
 [`ROADMAP.md`](ROADMAP.md) tracks what is shipped, what is next, and the decisions already
 made — including what it would take for other artists to use this.
