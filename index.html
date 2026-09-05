@@ -1210,18 +1210,38 @@
     return {entrants:a.join("\n") + "\n", rows:null};
   }
 
+  /* Embedded viewers block a page's own downloads and mediate saves through a
+     host call instead; a plain web server has no such host. Resolve whichever
+     is present once, then offer the file the same way from one code path. */
+  var saver = null;
+  if(window.claude && typeof window.claude.use === "function"){
+    try{
+      window.claude.use("downloads").then(function(d){ saver = d || null; },
+                                          function(){ saver = null; });
+    } catch(e){ saver = null; }
+  }
+
+  function offer(name, text){
+    if(saver){
+      return saver.save({filename:name, data:text}).then(
+        function(){ return "saved"; },
+        function(err){ return (err && err.code === "declined") ? "declined" : "failed"; }
+      );
+    }
+    try{ download(name, text); return Promise.resolve("saved"); }
+    catch(e){ return Promise.resolve("failed"); }
+  }
+
   $("dlBtn").addEventListener("click", function(){
     var r = redacted || seedRedacted();
-    var ok = false;
-    try{
-      download("entrants.csv", r.entrants);
-      if(r.rows) download("entries-redacted.csv", r.rows);
-      ok = true;
-    } catch(e){ ok = false; }
-    /* Downloads are blocked inside some embedded viewers — always leave a copy
-       on the clipboard so the data is recoverable either way. */
-    copyText(r.entrants).then(function(){
-      toast(ok ? "Downloaded — also copied to your clipboard" : "Copied to your clipboard");
+    offer("entrants.csv", r.entrants).then(function(res){
+      /* only one save prompt may be open at a time, so chain the second */
+      if(res === "saved" && r.rows) return offer("entries-redacted.csv", r.rows);
+      return res;
+    }).then(function(res){
+      if(res === "saved"){ toast("Redacted CSV saved"); return; }
+      if(res === "declined"){ toast("Save cancelled"); return; }
+      copyText(r.entrants).then(function(){ toast("Copied to your clipboard instead"); });
     });
   });
 
