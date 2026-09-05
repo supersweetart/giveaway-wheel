@@ -119,3 +119,6 @@ This repo is public because GitHub Pages needs it to be on a free account.
 
 No build step and no dependencies; Google Fonts is the only external request. Everything —
 markup, styles, wheel rendering, CSV parsing, audio synthesis — is in `index.html`.
+
+[`ROADMAP.md`](ROADMAP.md) tracks what is shipped, what is next, and the decisions already
+made — including what it would take for other artists to use this.
