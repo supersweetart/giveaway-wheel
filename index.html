@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The weighted spin wheel used to draw three September Sweet Mail winners from the Super Sweet Art 2K giveaway - 267 comment entries from 83 accounts.">
+<meta name="theme-color" content="#FFF6F2">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.92em%22%20font-size%3D%2292%22%3E%F0%9F%8E%A1%3C%2Ftext%3E%3C%2Fsvg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Super Sweet Art Giveaway Wheel">
+<meta property="og:description" content="267 comment entries, 83 entrants, 3 winners. Each comment is one entry, so a wider slice means more comments.">
+<style>
+  html{color-scheme:light}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>Super Sweet Art Giveaway Wheel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Karla:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --ground:#FFF6F2;
+    --paper:#FFFFFF;
+    --ink:#3B2340;
+    --ink-soft:#7A6280;
+    --ink-faint:#B5A2BC;
+    --line:#EBD9E2;
+    --air-red:#E0374F;
+    --air-blue:#2F5FC4;
+    --kraft:#D9926B;
+    --pink:#FF6F9C;
+    --pink-deep:#C93A6B;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"Karla","Helvetica Neue",Arial,sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- airmail frame ---- */
+  .frame{
+    min-height:100vh;
+    padding:14px;
+    background:
+      repeating-linear-gradient(-45deg,
+        var(--air-red) 0 11px,
+        var(--paper) 11px 22px,
+        var(--air-blue) 22px 33px,
+        var(--paper) 33px 44px);
+  }
+  .stage{
+    background:var(--ground);
+    min-height:calc(100vh - 28px);
+    padding:34px clamp(18px,4vw,54px) 54px;
+    position:relative;
+    overflow:hidden;
+  }
+  .stage::after{ /* faint postal grid wash */
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(circle at 78% 8%, rgba(255,111,156,.10), transparent 46%),
+               radial-gradient(circle at 6% 82%, rgba(63,197,163,.10), transparent 44%);
+  }
+  .stage > *{position:relative;z-index:1}
+
+  /* ---- masthead ---- */
+  header.masthead{
+    display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+    gap:18px 28px;
+    padding-bottom:16px;
+    border-bottom:2px dashed var(--line);
+  }
+  .lockup{display:flex;flex-direction:column;gap:2px}
+  .eyebrow{
+    font-family:"Space Mono",ui-monospace,monospace;
+    font-size:11px;letter-spacing:.20em;text-transform:uppercase;
+    color:var(--pink-deep);
+  }
+  h1{
+    font-family:"Caprasimo","Georgia",serif;
+    font-weight:400;
+    font-size:clamp(34px,5.4vw,60px);
+    line-height:.96;
+    margin:2px 0 0;
+    color:var(--ink);
+    text-wrap:balance;
+  }
+  h1 em{font-style:normal;color:var(--pink-deep)}
+  .subline{
+    font-family:"Space Mono",ui-monospace,monospace;
+    font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;
+  }
+
+  .facts{display:flex;gap:26px;flex-wrap:wrap}
+  .fact{display:flex;flex-direction:column;line-height:1.1}
+  .fact b{
+    font-family:"Caprasimo",Georgia,serif;font-weight:400;
+    font-size:30px;color:var(--ink);font-variant-numeric:tabular-nums;
+  }
+  .fact span{
+    font-family:"Space Mono",ui-monospace,monospace;
+    font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);
+    margin-top:3px;
+  }
+
+  /* ---- main grid ---- */
+  .board{
+    display:grid;
+    grid-template-columns:minmax(0,1.15fr) minmax(310px,.85fr);
+    gap:clamp(24px,4vw,56px);
+    align-items:start;
+    margin-top:30px;
+  }
+
+  /* ---- wheel ---- */
+  .wheelwrap{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .banner{
+    min-height:46px;display:flex;align-items:center;justify-content:center;
+    text-align:center;width:100%;
+  }
+  .banner .msg{
+    font-family:"Space Mono",ui-monospace,monospace;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);
+  }
+  .banner .hit{
+    display:inline-flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center;
+    background:var(--paper);
+    border:2px solid var(--ink);
+    border-radius:2px;
+    padding:7px 16px;
+    box-shadow:4px 4px 0 var(--pink);
+    animation:pop .45s cubic-bezier(.2,1.5,.4,1) both;
+  }
+  .banner .hit i{
+    font-style:normal;font-family:"Space Mono",monospace;font-size:10px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--pink-deep);
+  }
+  .banner .hit b{
+    font-family:"Caprasimo",Georgia,serif;font-weight:400;
+    font-size:clamp(19px,2.6vw,27px);
+    overflow-wrap:anywhere;
+  }
+  @keyframes pop{from{transform:scale(.86) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+
+  .dial{position:relative;width:min(100%,620px);aspect-ratio:1}
+  .dial canvas{width:100%;height:100%;display:block;
+    filter:drop-shadow(0 16px 26px rgba(59,35,64,.16));}
+  .hub{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:24%;aspect-ratio:1;border-radius:50%;
+    background:var(--paper);
+    border:3px solid var(--ink);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;pointer-events:none;
+    box-shadow:inset 0 0 0 5px var(--ground);
+  }
+  .hub .lab{
+    font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+  .hub .num{
+    font-family:"Caprasimo",Georgia,serif;font-size:clamp(20px,3.4vw,34px);
+    line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;
+  }
+  .hub.busy .num{animation:throb .7s ease-in-out infinite alternate}
+  @keyframes throb{to{transform:scale(1.09);color:var(--pink-deep)}}
+
+  .needle{
+    position:absolute;left:50%;top:-6px;transform:translateX(-50%);
+    width:44px;height:60px;pointer-events:none;
+    filter:drop-shadow(0 3px 4px rgba(59,35,64,.3));
+    transform-origin:50% 18%;
+  }
+  .needle.knock{animation:knock .09s ease-out}
+  @keyframes knock{50%{transform:translateX(-50%) rotate(-7deg)}}
+
+  /* ---- controls ---- */
+  .panel{display:flex;flex-direction:column;gap:22px}
+
+  .spin{
+    font-family:"Caprasimo",Georgia,serif;font-weight:400;
+    font-size:26px;letter-spacing:.03em;
+    color:var(--paper);
+    background:var(--pink-deep);
+    border:3px solid var(--ink);
+    border-radius:3px;
+    padding:16px 20px;
+    cursor:pointer;
+    box-shadow:6px 6px 0 var(--ink);
+    transition:transform .08s ease, box-shadow .08s ease, background .2s ease;
+  }
+  .spin:hover:not(:disabled){background:var(--pink)}
+  .spin:active:not(:disabled){transform:translate(6px,6px);box-shadow:0 0 0 var(--ink)}
+  .spin:disabled{background:var(--ink-faint);cursor:default;box-shadow:6px 6px 0 var(--line);border-color:var(--ink-faint);color:var(--ground)}
+  .spin:focus-visible,.mini:focus-visible{outline:3px solid var(--air-blue);outline-offset:3px}
+  .hint{
+    font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-faint);text-align:center;margin-top:-14px;
+  }
+
+  .minis{display:flex;gap:10px;flex-wrap:wrap}
+  .mini{
+    font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;
+    background:transparent;color:var(--ink-soft);
+    border:1.5px solid var(--line);border-radius:2px;
+    padding:7px 11px;cursor:pointer;
+    transition:border-color .18s, color .18s;
+  }
+  .mini:hover{border-color:var(--ink);color:var(--ink)}
+  .mini[aria-pressed="true"]{border-color:var(--pink-deep);color:var(--pink-deep)}
+
+  /* ---- winner stamps ---- */
+  .slots{display:flex;flex-direction:column;gap:16px}
+  .stampstack{display:flex;flex-direction:column;gap:16px}
+  .slots h2{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ink-soft);margin:0;font-weight:400;
+  }
+  .stamp{
+    position:relative;
+    background:var(--paper);
+    padding:16px 18px;
+    min-height:92px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .stamp::before,.stamp::after{
+    content:"";position:absolute;pointer-events:none;z-index:2;
+  }
+  .stamp::before{ /* top + bottom perforations */
+    left:0;right:0;top:-7px;height:calc(100% + 14px);
+    background:
+      radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) left top/15px 14px repeat-x,
+      radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) left bottom/15px 14px repeat-x;
+  }
+  .stamp::after{ /* left + right perforations */
+    top:0;bottom:0;left:-7px;width:calc(100% + 14px);
+    background:
+      radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) left top/14px 15px repeat-y,
+      radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) right top/14px 15px repeat-y;
+  }
+  .stamp .inner{
+    position:relative;z-index:3;display:flex;align-items:center;gap:14px;width:100%;
+  }
+  .stamp .no{
+    flex:none;width:40px;height:40px;border-radius:50%;
+    display:grid;place-items:center;
+    font-family:"Caprasimo",Georgia,serif;font-size:19px;
+    color:var(--paper);background:var(--ink-faint);
+  }
+  .stamp.filled .no{background:var(--pink-deep)}
+  .stamp .who{display:flex;flex-direction:column;min-width:0;gap:2px}
+  .stamp .who .name{
+    font-family:"Space Mono",monospace;font-weight:700;font-size:14.5px;
+    color:var(--ink);overflow-wrap:anywhere;
+  }
+  .stamp .who .meta{
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+  .stamp.empty{background:#FBEFF4}
+  .stamp.empty .who .name{color:var(--ink-faint);font-weight:400}
+  .stamp.filled{box-shadow:0 6px 16px rgba(201,58,107,.16)}
+  .stamp.filled .postmark{
+    position:absolute;z-index:4;right:6px;top:50%;
+    transform:translateY(-50%) rotate(-14deg);
+    opacity:.55;
+  }
+  .stamp.landing{animation:stampdown .5s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes stampdown{from{transform:scale(1.16) rotate(2.5deg);opacity:0}to{transform:none;opacity:1}}
+
+  /* ---- pool ---- */
+  .pool{margin-top:42px;padding-top:24px;border-top:2px dashed var(--line)}
+  .pool-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px}
+  .pool-head h2{
+    font-family:"Caprasimo",Georgia,serif;font-weight:400;font-size:24px;margin:0;
+  }
+  .pool-head p{
+    margin:0;max-width:62ch;color:var(--ink-soft);font-size:13.5px;
+  }
+  .grid{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(215px,1fr));
+    gap:5px 16px;
+  }
+  .ent{
+    display:flex;align-items:center;gap:9px;
+    padding:5px 2px;border-bottom:1px solid var(--line);
+    font-family:"Space Mono",monospace;font-size:12px;
+  }
+  .ent .chip{flex:none;width:11px;height:11px;border-radius:3px}
+  .ent .h{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+  .ent .c{color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .ent.out{opacity:.4}
+  .ent.out .h{text-decoration:line-through}
+  .ent.won{opacity:1}
+  .ent.won .h{color:var(--pink-deep);font-weight:700;text-decoration:none}
+
+  .fineprint{
+    margin-top:30px;font-size:12.5px;color:var(--ink-soft);max-width:74ch;
+  }
+  .fineprint b{color:var(--ink)}
+
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+  @media (max-width:860px){
+    .board{grid-template-columns:1fr}
+    .panel{order:2}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .banner .hit,.stamp.landing{animation:none}
+    .hub.busy .num{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+<div class="stage">
+
+  <header class="masthead">
+    <div class="lockup">
+      <div class="eyebrow">2,000 followers · thank you</div>
+      <h1>Super Sweet <em>Art</em></h1>
+      <div class="subline">@supersweetbyqiao — September Sweet Mail giveaway</div>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>267</b><span>Entries</span></div>
+      <div class="fact"><b>83</b><span>Entrants</span></div>
+      <div class="fact"><b>3</b><span>Winners</span></div>
+    </div>
+  </header>
+
+  <div class="board">
+
+    <div class="wheelwrap">
+      <div class="banner" id="banner" aria-live="polite">
+        <span class="msg">Ready — 83 entrants, 267 entries in the drum</span>
+      </div>
+      <div class="dial">
+        <canvas id="wheel" aria-label="Giveaway wheel, one slice per entrant sized by their number of comments"></canvas>
+        <svg class="needle" id="needle" viewBox="0 0 44 60" aria-hidden="true">
+          <path d="M22 58 C10 40 4 32 4 22 A18 18 0 0 1 40 22 C40 32 34 40 22 58 Z"
+                fill="#E0374F" stroke="#3B2340" stroke-width="3" stroke-linejoin="round"/>
+          <circle cx="22" cy="21" r="6.5" fill="#FFF6F2" stroke="#3B2340" stroke-width="2.5"/>
+        </svg>
+        <div class="hub" id="hub">
+          <span class="lab">Draw</span>
+          <span class="num" id="hubnum">1<span style="font-size:.5em">/3</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <button class="spin" id="spinBtn">Spin the wheel</button>
+      <div class="hint">or press the space bar</div>
+
+      <div class="slots">
+        <h2>September Sweet Mail — winners</h2>
+        <div id="stamps" class="stampstack"></div>
+      </div>
+
+      <div class="minis">
+        <button class="mini" id="soundBtn" aria-pressed="true">Sound on</button>
+        <button class="mini" id="resetBtn">Reset draw</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="pool">
+    <div class="pool-head">
+      <h2>The entry pool</h2>
+      <p>Each comment is one entry, so a wider slice means more comments. Names are struck through once that account has been drawn.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="fineprint">
+      <b>How this draw works.</b> 267 top-level comments from 83 accounts, posted between 25 and 31 August 2026 —
+      inside the 31 August, 11:59 PM PT deadline. Replies are excluded, and no account tagged the same friend twice,
+      so every comment counts as one entry. Each winner is chosen first by the browser’s cryptographic random
+      number generator, weighted by entry count; the wheel then spins to that result. A winner leaves the pool
+      before the next spin, so all three winners are different people.
+    </p>
+  </section>
+
+</div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+  "use strict";
+
+  var RAW = [["the.dapper.duo",19],["psychxdeliclove",16],["veronipie_",14],["inmyscrappyplace",11],["luacreates",11],["cozified.life",10],["justafoodlover_v",9],["parchment.problems",9],["janprudden",7],["mommyruru",7],["__tales_i_tell__",6],["annahd_",6],["postingwithtammy",6],["888aww",5],["agueroluli",5],["ara_al3xis",5],["little.zerox",5],["pawtternprints",5],["robynsomerville",5],["billwink39",4],["jessicabttran",4],["mel_indaaa",4],["nesi_lec",4],["oleksandra_petrenko_1313",4],["sojourn.al.junkrat",4],["___.dikshitha.___",3],["_eriii._.10_",3],["avan__tester",3],["chrono11",3],["lexi._reads",3],["m1ffyluv3rr",3],["nanuschka.mb",3],["cwzso",2],["fandisha",2],["jasminpetri38",2],["kindacutemailclub",2],["maddy.stationery",2],["nakadilat",2],["penpals.rus",2],["postcrossing_from_russia",2],["smashmelia",2],["tulip.chain",2],["ahintofglo",1],["albino_trex",1],["asiancara",1],["cacarlito_prv",1],["carla_srn07",1],["chobikenobi",1],["cperron66",1],["craftygirly2025",1],["emilyksprague",1],["everyartstudio",1],["fidgetislandco",1],["forsomeone.somew",1],["giraffe.88210871",1],["heidijones.526",1],["itsnotjustbookyoufool",1],["ivyilyll",1],["izzy.bakes.adl",1],["jeaneeart",1],["jesscrafting",1],["jzkr",1],["kerenzabennett",1],["lemonadecat01",1],["maika.artte",1],["ms_skuld",1],["myremedystudio",1],["naddaamalia_",1],["ness_who_",1],["penpal_ligaya",1],["phinayi",1],["racheldesiree",1],["rhmanton94",1],["sarahsartjourney_",1],["shanna.cards",1],["soapmachi",1],["storm.wolf.journals",1],["taileyh",1],["tokkidum",1],["uniquinn_alleyne",1],["vero_disco",1],["yenne.studios",1],["zuzubeanart",1]];
+
+  var CANDY = ["#FF6F9C","#FF8A5B","#FFB13D","#FFD84D","#B7D94C","#4FC98A",
+               "#35BFC0","#43A7E8","#7B8FEC","#A97CE6","#DE6FCB","#D9926B"];
+  var INK = "#3B2340", PAPER = "#FFFFFF", GROUND = "#FFF6F2";
+  var TOTAL_WINNERS = 3;
+
+  /* Seat entrants around the rim at a golden-angle stride so the widest
+     wedges land evenly spaced instead of bunching into one fat arc.
+     83 is prime, so every stride is coprime with it and every slot fills. */
+  function seat(list){
+    var n = list.length;
+    var stride = Math.max(1, Math.round(n / 1.6180339887));
+    var out = new Array(n);
+    for(var i=0;i<n;i++) out[(i * stride) % n] = list[i];
+    return out;
+  }
+
+  var ALL = seat(RAW.map(function(r,i){ return {u:r[0], n:r[1], rank:i}; }))
+              .map(function(e,i){ e.color = CANDY[i % CANDY.length]; return e; });
+
+  var pool = ALL.slice();
+  var winners = [];
+  var rot = -Math.PI/2;            // current wheel rotation
+  var spinning = false;
+  var pendingRemoval = null;       // winner still shown on the wheel
+  var highlight = null;            // entrant object to emphasise
+  var soundOn = true;
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var cv = document.getElementById("wheel"), ctx = cv.getContext("2d");
+  var needle = document.getElementById("needle");
+  var banner = document.getElementById("banner");
+  var hub = document.getElementById("hub"), hubnum = document.getElementById("hubnum");
+  var spinBtn = document.getElementById("spinBtn");
+  var stampsEl = document.getElementById("stamps");
+  var gridEl = document.getElementById("grid");
+
+  /* ---------- geometry ---------- */
+  function slices(){
+    var total = 0, i;
+    for(i=0;i<pool.length;i++) total += pool[i].n;
+    var out = [], a = 0;
+    for(i=0;i<pool.length;i++){
+      var span = pool[i].n / total * Math.PI * 2;
+      out.push({e:pool[i], a0:a, a1:a+span, span:span});
+      a += span;
+    }
+    return out;
+  }
+  var segs = slices();
+
+  function dark(hex){
+    var r=parseInt(hex.substr(1,2),16), g=parseInt(hex.substr(3,2),16), b=parseInt(hex.substr(5,2),16);
+    return (0.299*r + 0.587*g + 0.114*b) < 150;
+  }
+
+  /* ---------- painting ---------- */
+  function size(){
+    var box = cv.parentNode.getBoundingClientRect();
+    var css = Math.max(240, Math.min(box.width, 620));
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(css * dpr);
+    cv.height = Math.round(css * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return css;
+  }
+
+  function paint(){
+    var css = size();
+    var cx = css/2, cy = css/2;
+    var R = css/2 - 16;
+    ctx.clearRect(0,0,css,css);
+
+    /* rim */
+    ctx.beginPath(); ctx.arc(cx,cy,R+9,0,Math.PI*2);
+    ctx.fillStyle = INK; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,R+4.5,0,Math.PI*2);
+    ctx.fillStyle = GROUND; ctx.fill();
+
+    /* perforation dots around the rim, like stamp edging */
+    var dots = 72;
+    for(var d=0; d<dots; d++){
+      var ang = d/dots*Math.PI*2 + rot*0.25;
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(ang)*(R+6.7), cy + Math.sin(ang)*(R+6.7), 1.5, 0, Math.PI*2);
+      ctx.fillStyle = INK; ctx.globalAlpha = .5; ctx.fill(); ctx.globalAlpha = 1;
+    }
+
+    for(var i=0;i<segs.length;i++){
+      var s = segs[i];
+      var isHit = highlight && s.e === highlight;
+      var rr = isHit ? R + 4 : R;
+
+      ctx.save();
+      ctx.globalAlpha = (highlight && !isHit) ? 0.42 : 1;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx, cy, rr, s.a0 + rot, s.a1 + rot);
+      ctx.closePath();
+      ctx.fillStyle = s.e.color;
+      ctx.fill();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = "rgba(255,255,255,.85)";
+      ctx.stroke();
+      if(isHit){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = INK;
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      /* label, only where the wedge can hold one */
+      var deg = s.span * 180 / Math.PI;
+      if(deg >= 3.4){
+        var fs = Math.max(9, Math.min(17, deg * 0.95)) * (css/620);
+        fs = Math.max(7.5, fs);
+        var mid = (s.a0 + s.a1)/2 + rot;
+        var flipped = Math.cos(mid) < 0;   /* keep left-hand labels upright */
+        ctx.save();
+        ctx.globalAlpha = (highlight && !isHit) ? 0.42 : 1;
+        ctx.translate(cx,cy);
+        ctx.rotate(flipped ? mid + Math.PI : mid);
+        ctx.textAlign = flipped ? "left" : "right";
+        ctx.textBaseline = "middle";
+        ctx.font = (isHit ? "700 " : "400 ") + fs.toFixed(1) + 'px "Space Mono", ui-monospace, monospace';
+        ctx.fillStyle = dark(s.e.color) ? "#FFFFFF" : INK;
+        var label = s.e.u;
+        var room = rr * 0.68;
+        while(ctx.measureText(label).width > room && label.length > 4){
+          label = label.slice(0, -2);
+        }
+        if(label !== s.e.u) label += "…";
+        ctx.fillText(label, flipped ? -(rr - 12) : (rr - 12), 0);
+        ctx.restore();
+      }
+    }
+  }
+
+  /* ---------- audio ---------- */
+  var actx = null;
+  function ac(){
+    if(!actx && window.AudioContext) actx = new AudioContext();
+    if(actx && actx.state === "suspended") actx.resume();
+    return actx;
+  }
+  function tick(){
+    if(!soundOn || reduced) return;
+    var a = ac(); if(!a) return;
+    var o = a.createOscillator(), g = a.createGain();
+    o.type = "triangle"; o.frequency.value = 1320;
+    g.gain.setValueAtTime(.10, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, a.currentTime + .035);
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + .04);
+  }
+  function chime(){
+    if(!soundOn) return;
+    var a = ac(); if(!a) return;
+    [0,4,7,12].forEach(function(semi,i){
+      var o = a.createOscillator(), g = a.createGain();
+      o.type = "sine";
+      o.frequency.value = 523.25 * Math.pow(2, semi/12);
+      var t = a.currentTime + i*0.09;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(.16, t + .02);
+      g.gain.exponentialRampToValueAtTime(.001, t + .6);
+      o.connect(g); g.connect(a.destination);
+      o.start(t); o.stop(t + .62);
+    });
+  }
+
+  /* ---------- confetti ---------- */
+  var conf = document.getElementById("confetti"), cctx = conf.getContext("2d");
+  var bits = [], confRAF = null;
+  function fitConf(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    conf.width = innerWidth * dpr; conf.height = innerHeight * dpr;
+    cctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  fitConf();
+  function burst(){
+    if(reduced) return;
+    var box = cv.getBoundingClientRect();
+    var ox = box.left + box.width/2, oy = box.top + box.height/2;
+    for(var i=0;i<170;i++){
+      var ang = Math.random()*Math.PI*2, sp = 5 + Math.random()*13;
+      bits.push({
+        x:ox, y:oy,
+        vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 5,
+        w:5 + Math.random()*7, h:8 + Math.random()*9,
+        r:Math.random()*Math.PI, vr:(Math.random()-.5)*.32,
+        c:CANDY[(Math.random()*CANDY.length)|0], life:1
+      });
+    }
+    if(!confRAF) confRAF = requestAnimationFrame(stepConf);
+  }
+  function stepConf(){
+    cctx.clearRect(0,0,innerWidth,innerHeight);
+    for(var i=bits.length-1;i>=0;i--){
+      var b = bits[i];
+      b.vy += 0.34; b.vx *= 0.992; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+      b.life -= 0.0055;
+      if(b.life <= 0 || b.y > innerHeight + 60){ bits.splice(i,1); continue; }
+      cctx.save();
+      cctx.translate(b.x,b.y); cctx.rotate(b.r);
+      cctx.globalAlpha = Math.max(0, Math.min(1, b.life*1.6));
+      cctx.fillStyle = b.c;
+      cctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
+      cctx.restore();
+    }
+    if(bits.length){ confRAF = requestAnimationFrame(stepConf); }
+    else { confRAF = null; cctx.clearRect(0,0,innerWidth,innerHeight); }
+  }
+
+  /* ---------- random ---------- */
+  function rand(){
+    if(window.crypto && crypto.getRandomValues){
+      var u = new Uint32Array(1); crypto.getRandomValues(u);
+      return u[0] / 4294967296;
+    }
+    return Math.random();
+  }
+  function drawWinner(){
+    var total = 0, i;
+    for(i=0;i<pool.length;i++) total += pool[i].n;
+    var t = rand() * total, acc = 0;
+    for(i=0;i<pool.length;i++){
+      acc += pool[i].n;
+      if(t < acc) return pool[i];
+    }
+    return pool[pool.length-1];
+  }
+
+  /* ---------- UI shells ---------- */
+  function renderStamps(){
+    var html = "";
+    for(var i=0;i<TOTAL_WINNERS;i++){
+      var w = winners[i];
+      if(w){
+        html += '<div class="stamp filled' + (i === winners.length-1 ? ' landing' : '') + '">' +
+          '<div class="inner"><div class="no">' + (i+1) + '</div>' +
+          '<div class="who"><span class="name">@' + w.u + '</span>' +
+          '<span class="meta">' + w.n + (w.n === 1 ? ' entry' : ' entries') + ' · ' + w.pct + '% of the drum</span></div></div>' +
+          '<svg class="postmark" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">' +
+            '<circle cx="28" cy="28" r="24" fill="none" stroke="#2F5FC4" stroke-width="2"/>' +
+            '<circle cx="28" cy="28" r="19" fill="none" stroke="#2F5FC4" stroke-width="1"/>' +
+            '<text x="28" y="25" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">SEP 2026</text>' +
+            '<text x="28" y="36" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">SWEET MAIL</text>' +
+          '</svg></div>';
+      } else {
+        html += '<div class="stamp empty"><div class="inner"><div class="no">' + (i+1) + '</div>' +
+          '<div class="who"><span class="name">awaiting the spin</span>' +
+          '<span class="meta">winner ' + (i+1) + ' of 3</span></div></div></div>';
+      }
+    }
+    stampsEl.innerHTML = html;
+  }
+
+  function renderGrid(){
+    var won = {}, i;
+    for(i=0;i<winners.length;i++) won[winners[i].u] = true;
+    var live = {};
+    for(i=0;i<pool.length;i++) live[pool[i].u] = true;
+    var byRank = ALL.slice().sort(function(a,b){ return a.rank - b.rank; });
+    var html = "";
+    for(i=0;i<byRank.length;i++){
+      var e = byRank[i];
+      var cls = won[e.u] ? "ent won" : (live[e.u] ? "ent" : "ent out");
+      html += '<div class="' + cls + '"><span class="chip" style="background:' + e.color + '"></span>' +
+              '<span class="h">@' + e.u + '</span><span class="c">' + e.n + '</span></div>';
+    }
+    gridEl.innerHTML = html;
+  }
+
+  function say(html){ banner.innerHTML = html; }
+  function msg(text){ say('<span class="msg">' + text + '</span>'); }
+
+  function updateHub(){
+    var next = winners.length + 1;
+    if(winners.length >= TOTAL_WINNERS){
+      hub.querySelector(".lab").textContent = "Done";
+      hubnum.innerHTML = '3<span style="font-size:.5em">/3</span>';
+    } else {
+      hub.querySelector(".lab").textContent = "Draw";
+      hubnum.innerHTML = next + '<span style="font-size:.5em">/3</span>';
+    }
+  }
+
+  /* ---------- the spin ---------- */
+  var lastIdx = -1;
+  function segAtPointer(){
+    var base = ((-Math.PI/2 - rot) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+    for(var i=0;i<segs.length;i++){
+      if(base >= segs[i].a0 && base < segs[i].a1) return i;
+    }
+    return segs.length - 1;
+  }
+
+  function spin(){
+    if(spinning || winners.length >= TOTAL_WINNERS) return;
+
+    if(pendingRemoval){
+      pool = pool.filter(function(e){ return e !== pendingRemoval; });
+      pendingRemoval = null;
+      highlight = null;
+      segs = slices();
+      renderGrid();
+    }
+    highlight = null;
+
+    var winner = drawWinner();
+    var seg = null;
+    for(var i=0;i<segs.length;i++) if(segs[i].e === winner) seg = segs[i];
+
+    var inside = seg.a0 + seg.span * (0.18 + rand() * 0.64);
+    var turns = reduced ? 2 : (5 + Math.floor(rand()*3));
+    var target = -Math.PI/2 - inside;
+    var delta = ((target - rot) % (Math.PI*2) + Math.PI*2) % (Math.PI*2) + turns * Math.PI * 2;
+
+    var from = rot;
+    var dur = reduced ? 1400 : 7200;
+    var t0 = performance.now();
+
+    spinning = true;
+    spinBtn.disabled = true;
+    hub.classList.add("busy");
+    msg("Spinning for winner " + (winners.length + 1) + " of 3…");
+    lastIdx = segAtPointer();
+
+    function frame(now){
+      var t = Math.min(1, (now - t0) / dur);
+      var e = 1 - Math.pow(1 - t, 4.1);
+      rot = from + delta * e;
+      paint();
+      var idx = segAtPointer();
+      if(idx !== lastIdx){
+        lastIdx = idx;
+        tick();
+        needle.classList.remove("knock");
+        void needle.offsetWidth;
+        needle.classList.add("knock");
+      }
+      if(t < 1) requestAnimationFrame(frame);
+      else land(winner);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function land(winner){
+    spinning = false;
+    hub.classList.remove("busy");
+    rot = ((rot % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+    highlight = winner;
+    pendingRemoval = winner;
+
+    var total = 0;
+    for(var i=0;i<pool.length;i++) total += pool[i].n;
+    winner.pct = (winner.n / total * 100).toFixed(1);
+
+    winners.push(winner);
+    paint();
+    renderStamps();
+    renderGrid();
+    updateHub();
+    burst();
+    chime();
+
+    say('<span class="hit"><i>Winner ' + winners.length + ' of 3</i><b>@' + winner.u + '</b></span>');
+
+    if(winners.length >= TOTAL_WINNERS){
+      spinBtn.textContent = "All three drawn";
+      spinBtn.disabled = true;
+      setTimeout(function(){
+        say('<span class="hit"><i>Congratulations</i><b>' +
+            winners.map(function(w){ return "@" + w.u; }).join(" · ") + '</b></span>');
+      }, 2600);
+    } else {
+      spinBtn.disabled = false;
+      spinBtn.textContent = "Spin for winner " + (winners.length + 1);
+    }
+  }
+
+  /* ---------- controls ---------- */
+  spinBtn.addEventListener("click", spin);
+
+  document.addEventListener("keydown", function(ev){
+    if(ev.code === "Space" || ev.key === " "){
+      if(document.activeElement && document.activeElement.tagName === "BUTTON" &&
+         document.activeElement !== spinBtn) return;
+      ev.preventDefault();
+      spin();
+    }
+  });
+
+  document.getElementById("soundBtn").addEventListener("click", function(){
+    soundOn = !soundOn;
+    this.setAttribute("aria-pressed", String(soundOn));
+    this.textContent = soundOn ? "Sound on" : "Sound off";
+    if(soundOn) ac();
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if(spinning) return;
+    pool = ALL.slice();
+    winners = [];
+    pendingRemoval = null;
+    highlight = null;
+    segs = slices();
+    rot = -Math.PI/2;
+    spinBtn.disabled = false;
+    spinBtn.textContent = "Spin the wheel";
+    msg("Ready — 83 entrants, 267 entries in the drum");
+    updateHub();
+    renderStamps();
+    renderGrid();
+    paint();
+  });
+
+  window.addEventListener("resize", function(){ fitConf(); paint(); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
+
+  renderStamps();
+  renderGrid();
+  updateHub();
+  paint();
+})();
+</script>
+</body>
+</html>

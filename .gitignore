@@ -1,0 +1,7 @@
+# Raw comment exports stay local — they contain full comment text and the
+# handles of tagged third parties who never opted into being published.
+supersweetbyqiao_2K_giveaway_entries.csv
+*_entries.csv
+private/
+
+.DS_Store
