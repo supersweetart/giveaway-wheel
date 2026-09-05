@@ -120,6 +120,10 @@ This repo is public because GitHub Pages needs it to be on a free account.
 No build step and no dependencies; Google Fonts is the only external request. Everything —
 markup, styles, wheel rendering, CSV parsing, audio synthesis — is in `index.html`.
 
+The page chrome is sampled from supersweetstudio.ca — butter yellow `#F8D05C`, brand orange
+`#E15E2E`, cream ground. The wheel's own slice colours are separate from that on purpose:
+they have to stay far enough apart in hue to read as distinct wedges.
+
 The Super Sweet Art mark sits in the hub whenever the wheel is empty. It is embedded as a
 base64 data URI in `index.html`, so the page carries its own artwork wherever it is served;
 `assets/logo.png` keeps the web-sized source (440px, cropped from the 3000px original).

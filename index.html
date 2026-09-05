@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="A weighted spin wheel for Super Sweet Art giveaway draws. Import a comment export, watch the names stick themselves to the wheel, and draw winners on camera.">
-<meta name="theme-color" content="#FFF6F2">
+<meta name="theme-color" content="#FFF8EC">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.92em%22%20font-size%3D%2292%22%3E%F0%9F%8E%A1%3C%2Ftext%3E%3C%2Fsvg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Super Sweet Art Giveaway Wheel">
@@ -15,18 +15,22 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Karla:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap">
 <style>
   :root{
-    --ground:#FFF6F2;
+    /* sampled off supersweetstudio.ca: the butter yellow it uses for whole
+       sections, and the orange set as its brand accent */
+    --yellow:#F8D05C;
+    --yellow-deep:#EFC246;
+    --orange:#E15E2E;
+    --orange-deep:#C4471F;   /* deeper, for small text that needs the contrast */
+
+    --ground:#FFF8EC;
     --paper:#FFFFFF;
+    --wash:#FDF3E3;
     --ink:#3B2340;
-    --ink-soft:#7A6280;
-    --ink-faint:#B5A2BC;
-    --line:#EBD9E2;
+    --ink-soft:#7C6A5C;
+    --ink-faint:#BCAB98;
+    --line:#F0E2CC;
     --air-red:#E0374F;
-    --air-blue:#2F5FC4;
     --kraft:#D9926B;
-    --pink:#FF6F9C;
-    --pink-deep:#C93A6B;
-    --wash:#FBEFF4;
   }
 
   html{color-scheme:light}
@@ -52,7 +56,7 @@
       repeating-linear-gradient(-45deg,
         var(--air-red) 0 11px,
         var(--paper) 11px 22px,
-        var(--air-blue) 22px 33px,
+        var(--yellow) 22px 33px,
         var(--paper) 33px 44px);
   }
   .stage{
@@ -64,8 +68,8 @@
   }
   .stage::after{
     content:"";position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(circle at 78% 8%, rgba(255,111,156,.10), transparent 46%),
-               radial-gradient(circle at 6% 82%, rgba(63,197,163,.10), transparent 44%);
+    background:radial-gradient(circle at 78% 8%, rgba(248,208,92,.20), transparent 46%),
+               radial-gradient(circle at 6% 82%, rgba(225,94,46,.09), transparent 44%);
   }
   .stage > *{position:relative;z-index:1}
 
@@ -80,7 +84,7 @@
   .eyebrow{
     font-family:"Space Mono",ui-monospace,monospace;
     font-size:11px;letter-spacing:.20em;text-transform:uppercase;
-    color:var(--pink-deep);
+    color:var(--orange-deep);
   }
   h1{
     font-family:"Caprasimo","Georgia",serif;
@@ -91,7 +95,7 @@
     color:var(--ink);
     text-wrap:balance;
   }
-  h1 em{font-style:normal;color:var(--pink-deep)}
+  h1 em{font-style:normal;color:var(--orange-deep)}
   .subline{
     font-family:"Space Mono",ui-monospace,monospace;
     font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;
@@ -119,11 +123,11 @@
     transition:border-color .18s, color .18s, background .18s;
   }
   .mini:hover{border-color:var(--ink);color:var(--ink)}
-  .mini[aria-pressed="true"]{border-color:var(--pink-deep);color:var(--pink-deep)}
-  .mini.solid{background:var(--ink);color:var(--ground);border-color:var(--ink)}
-  .mini.solid:hover{background:var(--pink-deep);border-color:var(--pink-deep);color:#fff}
+  .mini[aria-pressed="true"]{border-color:var(--orange-deep);color:var(--orange-deep)}
+  .mini.solid{background:var(--orange);color:#fff;border-color:var(--orange)}
+  .mini.solid:hover{background:var(--orange-deep);border-color:var(--orange-deep);color:#fff}
   .mini:disabled{opacity:.45;cursor:default}
-  .mini:focus-visible,.spin:focus-visible,.drop:focus-visible{outline:3px solid var(--air-blue);outline-offset:3px}
+  .mini:focus-visible,.spin:focus-visible,.drop:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
   /* ---- main grid ---- */
   .board{
@@ -150,12 +154,12 @@
     border:2px solid var(--ink);
     border-radius:2px;
     padding:7px 16px;
-    box-shadow:4px 4px 0 var(--pink);
+    box-shadow:4px 4px 0 var(--yellow);
     animation:pop .45s cubic-bezier(.2,1.5,.4,1) both;
   }
   .banner .hit i{
     font-style:normal;font-family:"Space Mono",monospace;font-size:10px;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--pink-deep);
+    letter-spacing:.18em;text-transform:uppercase;color:var(--orange-deep);
   }
   .banner .hit b{
     font-family:"Caprasimo",Georgia,serif;font-weight:400;
@@ -189,7 +193,7 @@
     line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;
   }
   .hub.busy .num{animation:throb .7s ease-in-out infinite alternate}
-  @keyframes throb{to{transform:scale(1.09);color:var(--pink-deep)}}
+  @keyframes throb{to{transform:scale(1.09);color:var(--orange-deep)}}
 
   .needle{
     position:absolute;left:50%;top:-6px;transform:translateX(-50%);
@@ -206,8 +210,8 @@
   .spin{
     font-family:"Caprasimo",Georgia,serif;font-weight:400;
     font-size:26px;letter-spacing:.03em;
-    color:var(--paper);
-    background:var(--pink-deep);
+    color:var(--ink);
+    background:var(--yellow);
     border:3px solid var(--ink);
     border-radius:3px;
     padding:16px 20px;
@@ -215,9 +219,9 @@
     box-shadow:6px 6px 0 var(--ink);
     transition:transform .08s ease, box-shadow .08s ease, background .2s ease;
   }
-  .spin:hover:not(:disabled){background:var(--pink)}
+  .spin:hover:not(:disabled){background:var(--yellow-deep)}
   .spin:active:not(:disabled){transform:translate(6px,6px);box-shadow:0 0 0 var(--ink)}
-  .spin:disabled{background:var(--ink-faint);cursor:default;box-shadow:6px 6px 0 var(--line);border-color:var(--ink-faint);color:var(--ground)}
+  .spin:disabled{background:#F7E7B4;cursor:default;box-shadow:6px 6px 0 var(--line);border-color:var(--ink-faint);color:var(--ink-soft)}
   .hint{
     font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--ink-faint);text-align:center;margin-top:-14px;
@@ -258,7 +262,7 @@
     font-family:"Caprasimo",Georgia,serif;font-size:19px;
     color:var(--paper);background:var(--ink-faint);
   }
-  .stamp.filled .no{background:var(--pink-deep)}
+  .stamp.filled .no{background:var(--orange)}
   .stamp .who{display:flex;flex-direction:column;min-width:0;gap:2px}
   .stamp .who .name{
     font-family:"Space Mono",monospace;font-weight:700;font-size:14.5px;
@@ -270,7 +274,7 @@
   }
   .stamp.empty{background:var(--wash)}
   .stamp.empty .who .name{color:var(--ink-faint);font-weight:400}
-  .stamp.filled{box-shadow:0 6px 16px rgba(201,58,107,.16)}
+  .stamp.filled{box-shadow:0 6px 16px rgba(225,94,46,.20)}
   .stamp.filled .postmark{
     position:absolute;z-index:4;right:6px;top:50%;
     transform:translateY(-50%) rotate(-14deg);opacity:.55;
@@ -299,7 +303,7 @@
   .ent .c{color:var(--ink-soft);font-variant-numeric:tabular-nums}
   .ent.out{opacity:.4}
   .ent.out .h{text-decoration:line-through}
-  .ent.won .h{color:var(--pink-deep);font-weight:700;text-decoration:none}
+  .ent.won .h{color:var(--orange-deep);font-weight:700;text-decoration:none}
 
   .fineprint{margin-top:30px;font-size:12.5px;color:var(--ink-soft);max-width:74ch}
   .fineprint b{color:var(--ink)}
@@ -341,7 +345,7 @@
     padding:30px 20px;cursor:pointer;
     transition:border-color .18s, background .18s, transform .18s;
   }
-  .drop:hover,.drop.over{border-color:var(--pink-deep);background:var(--wash)}
+  .drop:hover,.drop.over{border-color:var(--orange-deep);background:var(--wash)}
   .drop.over{transform:scale(1.01)}
   .drop .big{
     font-family:"Caprasimo",Georgia,serif;font-size:20px;display:block;margin-bottom:4px;
@@ -366,7 +370,7 @@
     display:flex;align-items:flex-start;gap:10px;font-size:13.5px;cursor:pointer;
     padding:2px 0;
   }
-  .opt input{margin:3px 0 0;accent-color:var(--pink-deep);flex:none}
+  .opt input{margin:3px 0 0;accent-color:var(--orange-deep);flex:none}
   .opt .t{display:flex;flex-direction:column}
   .opt .t small{color:var(--ink-soft);font-size:11.5px}
   .row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
@@ -380,7 +384,7 @@
     border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
     padding:8px 10px;border-radius:2px;
   }
-  .field input:focus{outline:2px solid var(--air-blue);outline-offset:1px}
+  .field input:focus{outline:2px solid var(--ink);outline-offset:1px}
   .field input[type=number]{width:88px}
 
   .sheet .actions{
@@ -389,14 +393,14 @@
   }
   .go{
     font-family:"Caprasimo",Georgia,serif;font-size:19px;
-    background:var(--pink-deep);color:#fff;border:2.5px solid var(--ink);
+    background:var(--yellow);color:var(--ink);border:2.5px solid var(--ink);
     padding:11px 20px;cursor:pointer;border-radius:2px;
     box-shadow:4px 4px 0 var(--ink);
   }
-  .go:hover:not(:disabled){background:var(--pink)}
+  .go:hover:not(:disabled){background:var(--yellow-deep)}
   .go:active:not(:disabled){transform:translate(4px,4px);box-shadow:0 0 0}
-  .go:disabled{background:var(--ink-faint);border-color:var(--ink-faint);cursor:default;box-shadow:4px 4px 0 var(--line)}
-  .go:focus-visible{outline:3px solid var(--air-blue);outline-offset:3px}
+  .go:disabled{background:var(--wash);border-color:var(--ink-faint);color:var(--ink-soft);cursor:default;box-shadow:4px 4px 0 var(--line)}
+  .go:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
   .note{font-size:12px;color:var(--ink-soft);max-width:46ch}
 
   .toast{
@@ -451,7 +455,7 @@
         <svg class="needle" id="needle" viewBox="0 0 44 60" aria-hidden="true">
           <path d="M22 58 C10 40 4 32 4 22 A18 18 0 0 1 40 22 C40 32 34 40 22 58 Z"
                 fill="#E0374F" stroke="#3B2340" stroke-width="3" stroke-linejoin="round"/>
-          <circle cx="22" cy="21" r="6.5" fill="#FFF6F2" stroke="#3B2340" stroke-width="2.5"/>
+          <circle cx="22" cy="21" r="6.5" fill="#FFF8EC" stroke="#3B2340" stroke-width="2.5"/>
         </svg>
         <div class="hub brand" id="hub">
           <img class="hublogo" id="hubLogo" alt="Super Sweet Art"
@@ -511,7 +515,7 @@
 
   var CANDY = ["#FF6F9C","#FF8A5B","#FFB13D","#FFD84D","#B7D94C","#4FC98A",
                "#35BFC0","#43A7E8","#7B8FEC","#A97CE6","#DE6FCB","#D9926B"];
-  var INK = "#3B2340", GROUND = "#FFF6F2";
+  var INK = "#3B2340", GROUND = "#FFF8EC";
 
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -618,7 +622,7 @@
          what the wedges fill into as they are placed — without it the build
          reads as a broken wheel rather than one being loaded. */
       ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
-      ctx.fillStyle = "#FBEFF4"; ctx.fill();
+      ctx.fillStyle = "#FDF3E3"; ctx.fill();
       ctx.save();
       ctx.strokeStyle = "rgba(59,35,64,.20)";
       ctx.lineWidth = 1.3;
@@ -881,10 +885,10 @@
           '<div class="who"><span class="name">@' + esc(w.u) + '</span>' +
           '<span class="meta">' + w.n + (w.n === 1 ? ' entry' : ' entries') + ' · ' + w.pct + '% of the drum</span></div></div>' +
           '<svg class="postmark" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">' +
-            '<circle cx="28" cy="28" r="24" fill="none" stroke="#2F5FC4" stroke-width="2"/>' +
-            '<circle cx="28" cy="28" r="19" fill="none" stroke="#2F5FC4" stroke-width="1"/>' +
-            '<text x="28" y="25" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">DRAWN</text>' +
-            '<text x="28" y="36" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">SWEET MAIL</text>' +
+            '<circle cx="28" cy="28" r="24" fill="none" stroke="#C4471F" stroke-width="2"/>' +
+            '<circle cx="28" cy="28" r="19" fill="none" stroke="#C4471F" stroke-width="1"/>' +
+            '<text x="28" y="25" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#C4471F">DRAWN</text>' +
+            '<text x="28" y="36" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#C4471F">SWEET MAIL</text>' +
           '</svg></div>';
       } else {
         html += '<div class="stamp empty"><div class="inner"><div class="no">' + (i+1) + '</div>' +

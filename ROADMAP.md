@@ -22,6 +22,9 @@ Shipped and live at https://supersweetart.github.io/giveaway-wheel/
 - [x] `tools/publish-draw.py` — redact, rewrite, commit, push in one command
 - [x] Published to GitHub Pages; raw exports git-ignored
 - [x] Brand mark in the hub when the wheel is empty
+- [x] Warm scheme sampled off supersweetstudio.ca — butter yellow `#F8D05C` on the primary
+      buttons, brand orange `#E15E2E` on the import button and winner badges, cream ground,
+      red-and-yellow border. The wheel's own 12 slice colours are deliberately untouched.
 
 **One thing still unverified in a real browser:** after the build animation completes, the
 Spin button should return to its enabled pink state. Headless Chrome couldn't test this
@@ -56,10 +59,10 @@ The two that stand between this and "another artist can use it".
 
 ### Making it shareable
 
-- [ ] **Palette per artist** — **M**. The candy palette is the page's own, not sampled from
-      any brand. Let an artist pick an accent and derive the wheel colours from it, or choose
-      from a few sets. (A warm palette drawn from the Super Sweet Art mark was tried and
-      rolled back — worth revisiting as an *option*, not as the default.)
+- [ ] **Palette per artist** — **M**. The page chrome is now Super Sweet Art's, sampled from
+      the live site; the wheel's 12 slice colours are still the page's own. Let an artist point
+      at their site or drop in a logo and have both derived automatically — the sampling was
+      done here by rendering the site headless and reading the pixels, which is repeatable.
 - [ ] **A "your first draw" walkthrough** — **S**. First-time visitors see an empty wheel
       and two buttons with no explanation of what file to bring.
 - [ ] **Draw history** — **M**. Every publish overwrites the saved draw. Past draws should
