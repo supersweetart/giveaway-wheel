@@ -3,17 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="The weighted spin wheel used to draw three September Sweet Mail winners from the Super Sweet Art 2K giveaway - 267 comment entries from 83 accounts.">
+<meta name="description" content="A weighted spin wheel for Super Sweet Art giveaway draws. Import a comment export, watch the names stick themselves to the wheel, and draw winners on camera.">
 <meta name="theme-color" content="#FFF6F2">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.92em%22%20font-size%3D%2292%22%3E%F0%9F%8E%A1%3C%2Ftext%3E%3C%2Fsvg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Super Sweet Art Giveaway Wheel">
-<meta property="og:description" content="267 comment entries, 83 entrants, 3 winners. Each comment is one entry, so a wider slice means more comments.">
-<style>
-  html{color-scheme:light}
-  img{max-width:100%}
-  [hidden]{display:none!important}
-</style>
+<meta property="og:description" content="Each comment is one entry, so a wider slice means more comments.">
 <title>Super Sweet Art Giveaway Wheel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,9 +26,14 @@
     --kraft:#D9926B;
     --pink:#FF6F9C;
     --pink-deep:#C93A6B;
+    --wash:#FBEFF4;
   }
 
+  html{color-scheme:light}
   *{box-sizing:border-box}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+
   body{
     margin:0;
     background:var(--ground);
@@ -62,7 +62,7 @@
     position:relative;
     overflow:hidden;
   }
-  .stage::after{ /* faint postal grid wash */
+  .stage::after{
     content:"";position:absolute;inset:0;pointer-events:none;
     background:radial-gradient(circle at 78% 8%, rgba(255,111,156,.10), transparent 46%),
                radial-gradient(circle at 6% 82%, rgba(63,197,163,.10), transparent 44%);
@@ -96,7 +96,7 @@
     font-family:"Space Mono",ui-monospace,monospace;
     font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;
   }
-
+  .rightcol{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
   .facts{display:flex;gap:26px;flex-wrap:wrap}
   .fact{display:flex;flex-direction:column;line-height:1.1}
   .fact b{
@@ -109,10 +109,26 @@
     margin-top:3px;
   }
 
+  /* ---- shared small button ---- */
+  .mini{
+    font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;
+    background:transparent;color:var(--ink-soft);
+    border:1.5px solid var(--line);border-radius:2px;
+    padding:7px 11px;cursor:pointer;
+    transition:border-color .18s, color .18s, background .18s;
+  }
+  .mini:hover{border-color:var(--ink);color:var(--ink)}
+  .mini[aria-pressed="true"]{border-color:var(--pink-deep);color:var(--pink-deep)}
+  .mini.solid{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+  .mini.solid:hover{background:var(--pink-deep);border-color:var(--pink-deep);color:#fff}
+  .mini:disabled{opacity:.45;cursor:default}
+  .mini:focus-visible,.spin:focus-visible,.drop:focus-visible{outline:3px solid var(--air-blue);outline-offset:3px}
+
   /* ---- main grid ---- */
   .board{
     display:grid;
-    grid-template-columns:minmax(0,1.15fr) minmax(310px,.85fr);
+    grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);
     gap:clamp(24px,4vw,56px);
     align-items:start;
     margin-top:30px;
@@ -198,23 +214,11 @@
   .spin:hover:not(:disabled){background:var(--pink)}
   .spin:active:not(:disabled){transform:translate(6px,6px);box-shadow:0 0 0 var(--ink)}
   .spin:disabled{background:var(--ink-faint);cursor:default;box-shadow:6px 6px 0 var(--line);border-color:var(--ink-faint);color:var(--ground)}
-  .spin:focus-visible,.mini:focus-visible{outline:3px solid var(--air-blue);outline-offset:3px}
   .hint{
     font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--ink-faint);text-align:center;margin-top:-14px;
   }
-
   .minis{display:flex;gap:10px;flex-wrap:wrap}
-  .mini{
-    font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.14em;
-    text-transform:uppercase;
-    background:transparent;color:var(--ink-soft);
-    border:1.5px solid var(--line);border-radius:2px;
-    padding:7px 11px;cursor:pointer;
-    transition:border-color .18s, color .18s;
-  }
-  .mini:hover{border-color:var(--ink);color:var(--ink)}
-  .mini[aria-pressed="true"]{border-color:var(--pink-deep);color:var(--pink-deep)}
 
   /* ---- winner stamps ---- */
   .slots{display:flex;flex-direction:column;gap:16px}
@@ -230,24 +234,20 @@
     min-height:92px;
     display:flex;align-items:center;gap:14px;
   }
-  .stamp::before,.stamp::after{
-    content:"";position:absolute;pointer-events:none;z-index:2;
-  }
-  .stamp::before{ /* top + bottom perforations */
+  .stamp::before,.stamp::after{content:"";position:absolute;pointer-events:none;z-index:2}
+  .stamp::before{
     left:0;right:0;top:-7px;height:calc(100% + 14px);
     background:
       radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) left top/15px 14px repeat-x,
       radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) left bottom/15px 14px repeat-x;
   }
-  .stamp::after{ /* left + right perforations */
+  .stamp::after{
     top:0;bottom:0;left:-7px;width:calc(100% + 14px);
     background:
       radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) left top/14px 15px repeat-y,
       radial-gradient(circle 7px at center, var(--ground) 96%, transparent 100%) right top/14px 15px repeat-y;
   }
-  .stamp .inner{
-    position:relative;z-index:3;display:flex;align-items:center;gap:14px;width:100%;
-  }
+  .stamp .inner{position:relative;z-index:3;display:flex;align-items:center;gap:14px;width:100%}
   .stamp .no{
     flex:none;width:40px;height:40px;border-radius:50%;
     display:grid;place-items:center;
@@ -264,13 +264,12 @@
     font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink-soft);
   }
-  .stamp.empty{background:#FBEFF4}
+  .stamp.empty{background:var(--wash)}
   .stamp.empty .who .name{color:var(--ink-faint);font-weight:400}
   .stamp.filled{box-shadow:0 6px 16px rgba(201,58,107,.16)}
   .stamp.filled .postmark{
     position:absolute;z-index:4;right:6px;top:50%;
-    transform:translateY(-50%) rotate(-14deg);
-    opacity:.55;
+    transform:translateY(-50%) rotate(-14deg);opacity:.55;
   }
   .stamp.landing{animation:stampdown .5s cubic-bezier(.2,1.4,.4,1) both}
   @keyframes stampdown{from{transform:scale(1.16) rotate(2.5deg);opacity:0}to{transform:none;opacity:1}}
@@ -278,12 +277,8 @@
   /* ---- pool ---- */
   .pool{margin-top:42px;padding-top:24px;border-top:2px dashed var(--line)}
   .pool-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px}
-  .pool-head h2{
-    font-family:"Caprasimo",Georgia,serif;font-weight:400;font-size:24px;margin:0;
-  }
-  .pool-head p{
-    margin:0;max-width:62ch;color:var(--ink-soft);font-size:13.5px;
-  }
+  .pool-head h2{font-family:"Caprasimo",Georgia,serif;font-weight:400;font-size:24px;margin:0}
+  .pool-head p{margin:0;max-width:62ch;color:var(--ink-soft);font-size:13.5px}
   .grid{
     margin-top:18px;
     display:grid;
@@ -300,40 +295,144 @@
   .ent .c{color:var(--ink-soft);font-variant-numeric:tabular-nums}
   .ent.out{opacity:.4}
   .ent.out .h{text-decoration:line-through}
-  .ent.won{opacity:1}
   .ent.won .h{color:var(--pink-deep);font-weight:700;text-decoration:none}
 
-  .fineprint{
-    margin-top:30px;font-size:12.5px;color:var(--ink-soft);max-width:74ch;
-  }
+  .fineprint{margin-top:30px;font-size:12.5px;color:var(--ink-soft);max-width:74ch}
   .fineprint b{color:var(--ink)}
 
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
 
+  /* ---- import overlay ---- */
+  .veil{
+    position:fixed;inset:0;z-index:60;
+    background:rgba(59,35,64,.55);
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:5vh 16px;overflow-y:auto;
+    animation:fade .2s ease both;
+  }
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .sheet{
+    width:min(660px,100%);
+    background:var(--ground);
+    border:3px solid var(--ink);
+    box-shadow:10px 10px 0 rgba(59,35,64,.25);
+    padding:26px clamp(18px,3.4vw,32px) 28px;
+    animation:rise .28s cubic-bezier(.2,1.2,.4,1) both;
+  }
+  @keyframes rise{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+  .sheet h2{
+    font-family:"Caprasimo",Georgia,serif;font-weight:400;font-size:27px;margin:0 0 4px;
+  }
+  .sheet .lede{margin:0 0 20px;color:var(--ink-soft);font-size:13.5px;max-width:58ch}
+  .sheet section{margin-top:20px}
+  .sheet h3{
+    font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ink-soft);font-weight:400;margin:0 0 10px;
+  }
+
+  .drop{
+    display:block;width:100%;text-align:center;
+    border:2.5px dashed var(--ink-faint);
+    background:var(--paper);
+    padding:30px 20px;cursor:pointer;
+    transition:border-color .18s, background .18s, transform .18s;
+  }
+  .drop:hover,.drop.over{border-color:var(--pink-deep);background:var(--wash)}
+  .drop.over{transform:scale(1.01)}
+  .drop .big{
+    font-family:"Caprasimo",Georgia,serif;font-size:20px;display:block;margin-bottom:4px;
+  }
+  .drop .small{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+
+  .readout{
+    background:var(--paper);border:1.5px solid var(--line);
+    padding:14px 16px;font-family:"Space Mono",monospace;font-size:12px;
+  }
+  .readout div{display:flex;justify-content:space-between;gap:14px;padding:3px 0}
+  .readout div + div{border-top:1px solid var(--line)}
+  .readout .k{color:var(--ink-soft)}
+  .readout .v{color:var(--ink);text-align:right;overflow-wrap:anywhere}
+  .readout .v.warn{color:var(--air-red)}
+
+  .opts{display:flex;flex-direction:column;gap:9px}
+  .opt{
+    display:flex;align-items:flex-start;gap:10px;font-size:13.5px;cursor:pointer;
+    padding:2px 0;
+  }
+  .opt input{margin:3px 0 0;accent-color:var(--pink-deep);flex:none}
+  .opt .t{display:flex;flex-direction:column}
+  .opt .t small{color:var(--ink-soft);font-size:11.5px}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field label{
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+  .field input{
+    font-family:"Space Mono",monospace;font-size:13px;
+    border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
+    padding:8px 10px;border-radius:2px;
+  }
+  .field input:focus{outline:2px solid var(--air-blue);outline-offset:1px}
+  .field input[type=number]{width:88px}
+
+  .sheet .actions{
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+    margin-top:24px;padding-top:18px;border-top:2px dashed var(--line);
+  }
+  .go{
+    font-family:"Caprasimo",Georgia,serif;font-size:19px;
+    background:var(--pink-deep);color:#fff;border:2.5px solid var(--ink);
+    padding:11px 20px;cursor:pointer;border-radius:2px;
+    box-shadow:4px 4px 0 var(--ink);
+  }
+  .go:hover:not(:disabled){background:var(--pink)}
+  .go:active:not(:disabled){transform:translate(4px,4px);box-shadow:0 0 0}
+  .go:disabled{background:var(--ink-faint);border-color:var(--ink-faint);cursor:default;box-shadow:4px 4px 0 var(--line)}
+  .go:focus-visible{outline:3px solid var(--air-blue);outline-offset:3px}
+  .note{font-size:12px;color:var(--ink-soft);max-width:46ch}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+    z-index:70;background:var(--ink);color:var(--ground);
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;
+    padding:11px 18px;border-radius:2px;
+    box-shadow:0 8px 24px rgba(59,35,64,.3);
+    animation:pop .3s cubic-bezier(.2,1.5,.4,1) both;
+  }
+
   @media (max-width:860px){
     .board{grid-template-columns:1fr}
     .panel{order:2}
+    .rightcol{align-items:flex-start}
   }
   @media (prefers-reduced-motion:reduce){
-    .banner .hit,.stamp.landing{animation:none}
+    .banner .hit,.stamp.landing,.sheet,.veil,.toast{animation:none}
     .hub.busy .num{animation:none}
   }
 </style>
 </head>
 <body>
+
 <div class="frame">
 <div class="stage">
 
   <header class="masthead">
     <div class="lockup">
-      <div class="eyebrow">2,000 followers · thank you</div>
+      <div class="eyebrow" id="eyebrow">2,000 followers · thank you</div>
       <h1>Super Sweet <em>Art</em></h1>
-      <div class="subline">@supersweetbyqiao — September Sweet Mail giveaway</div>
+      <div class="subline" id="subline">@supersweetbyqiao — September Sweet Mail giveaway</div>
     </div>
-    <div class="facts">
-      <div class="fact"><b>267</b><span>Entries</span></div>
-      <div class="fact"><b>83</b><span>Entrants</span></div>
-      <div class="fact"><b>3</b><span>Winners</span></div>
+    <div class="rightcol">
+      <div class="facts">
+        <div class="fact"><b id="fEntries">267</b><span>Entries</span></div>
+        <div class="fact"><b id="fEntrants">83</b><span>Entrants</span></div>
+        <div class="fact"><b id="fWinners">3</b><span>Winners</span></div>
+      </div>
+      <button class="mini solid" id="importBtn">Import a CSV</button>
     </div>
   </header>
 
@@ -344,14 +443,14 @@
         <span class="msg">Ready — 83 entrants, 267 entries in the drum</span>
       </div>
       <div class="dial">
-        <canvas id="wheel" aria-label="Giveaway wheel, one slice per entrant sized by their number of comments"></canvas>
+        <canvas id="wheel" aria-label="Giveaway wheel, one slice per entrant sized by their number of entries"></canvas>
         <svg class="needle" id="needle" viewBox="0 0 44 60" aria-hidden="true">
           <path d="M22 58 C10 40 4 32 4 22 A18 18 0 0 1 40 22 C40 32 34 40 22 58 Z"
                 fill="#E0374F" stroke="#3B2340" stroke-width="3" stroke-linejoin="round"/>
           <circle cx="22" cy="21" r="6.5" fill="#FFF6F2" stroke="#3B2340" stroke-width="2.5"/>
         </svg>
         <div class="hub" id="hub">
-          <span class="lab">Draw</span>
+          <span class="lab" id="hublab">Draw</span>
           <span class="num" id="hubnum">1<span style="font-size:.5em">/3</span></span>
         </div>
       </div>
@@ -362,13 +461,14 @@
       <div class="hint">or press the space bar</div>
 
       <div class="slots">
-        <h2>September Sweet Mail — winners</h2>
+        <h2 id="slotsTitle">September Sweet Mail — winners</h2>
         <div id="stamps" class="stampstack"></div>
       </div>
 
       <div class="minis">
         <button class="mini" id="soundBtn" aria-pressed="true">Sound on</button>
         <button class="mini" id="resetBtn">Reset draw</button>
+        <button class="mini" id="dlBtn">Download redacted CSV</button>
       </div>
     </div>
   </div>
@@ -379,13 +479,7 @@
       <p>Each comment is one entry, so a wider slice means more comments. Names are struck through once that account has been drawn.</p>
     </div>
     <div class="grid" id="grid"></div>
-    <p class="fineprint">
-      <b>How this draw works.</b> 267 top-level comments from 83 accounts, posted between 25 and 31 August 2026 —
-      inside the 31 August, 11:59 PM PT deadline. Replies are excluded, and no account tagged the same friend twice,
-      so every comment counts as one entry. Each winner is chosen first by the browser’s cryptographic random
-      number generator, weighted by entry count; the wheel then spins to that result. A winner leaves the pool
-      before the next spin, so all three winners are different people.
-    </p>
+    <p class="fineprint" id="fineprint"></p>
   </section>
 
 </div>
@@ -396,49 +490,75 @@
 (function(){
   "use strict";
 
-  var RAW = [["the.dapper.duo",19],["psychxdeliclove",16],["veronipie_",14],["inmyscrappyplace",11],["luacreates",11],["cozified.life",10],["justafoodlover_v",9],["parchment.problems",9],["janprudden",7],["mommyruru",7],["__tales_i_tell__",6],["annahd_",6],["postingwithtammy",6],["888aww",5],["agueroluli",5],["ara_al3xis",5],["little.zerox",5],["pawtternprints",5],["robynsomerville",5],["billwink39",4],["jessicabttran",4],["mel_indaaa",4],["nesi_lec",4],["oleksandra_petrenko_1313",4],["sojourn.al.junkrat",4],["___.dikshitha.___",3],["_eriii._.10_",3],["avan__tester",3],["chrono11",3],["lexi._reads",3],["m1ffyluv3rr",3],["nanuschka.mb",3],["cwzso",2],["fandisha",2],["jasminpetri38",2],["kindacutemailclub",2],["maddy.stationery",2],["nakadilat",2],["penpals.rus",2],["postcrossing_from_russia",2],["smashmelia",2],["tulip.chain",2],["ahintofglo",1],["albino_trex",1],["asiancara",1],["cacarlito_prv",1],["carla_srn07",1],["chobikenobi",1],["cperron66",1],["craftygirly2025",1],["emilyksprague",1],["everyartstudio",1],["fidgetislandco",1],["forsomeone.somew",1],["giraffe.88210871",1],["heidijones.526",1],["itsnotjustbookyoufool",1],["ivyilyll",1],["izzy.bakes.adl",1],["jeaneeart",1],["jesscrafting",1],["jzkr",1],["kerenzabennett",1],["lemonadecat01",1],["maika.artte",1],["ms_skuld",1],["myremedystudio",1],["naddaamalia_",1],["ness_who_",1],["penpal_ligaya",1],["phinayi",1],["racheldesiree",1],["rhmanton94",1],["sarahsartjourney_",1],["shanna.cards",1],["soapmachi",1],["storm.wolf.journals",1],["taileyh",1],["tokkidum",1],["uniquinn_alleyne",1],["vero_disco",1],["yenne.studios",1],["zuzubeanart",1]];
+  /* ================= built-in draw: the 2K giveaway ================= */
+  var SEED_ENTRANTS = [["the.dapper.duo",19],["psychxdeliclove",16],["veronipie_",14],["inmyscrappyplace",11],["luacreates",11],["cozified.life",10],["justafoodlover_v",9],["parchment.problems",9],["janprudden",7],["mommyruru",7],["__tales_i_tell__",6],["annahd_",6],["postingwithtammy",6],["888aww",5],["agueroluli",5],["ara_al3xis",5],["little.zerox",5],["pawtternprints",5],["robynsomerville",5],["billwink39",4],["jessicabttran",4],["mel_indaaa",4],["nesi_lec",4],["oleksandra_petrenko_1313",4],["sojourn.al.junkrat",4],["___.dikshitha.___",3],["_eriii._.10_",3],["avan__tester",3],["chrono11",3],["lexi._reads",3],["m1ffyluv3rr",3],["nanuschka.mb",3],["cwzso",2],["fandisha",2],["jasminpetri38",2],["kindacutemailclub",2],["maddy.stationery",2],["nakadilat",2],["penpals.rus",2],["postcrossing_from_russia",2],["smashmelia",2],["tulip.chain",2],["ahintofglo",1],["albino_trex",1],["asiancara",1],["cacarlito_prv",1],["carla_srn07",1],["chobikenobi",1],["cperron66",1],["craftygirly2025",1],["emilyksprague",1],["everyartstudio",1],["fidgetislandco",1],["forsomeone.somew",1],["giraffe.88210871",1],["heidijones.526",1],["itsnotjustbookyoufool",1],["ivyilyll",1],["izzy.bakes.adl",1],["jeaneeart",1],["jesscrafting",1],["jzkr",1],["kerenzabennett",1],["lemonadecat01",1],["maika.artte",1],["ms_skuld",1],["myremedystudio",1],["naddaamalia_",1],["ness_who_",1],["penpal_ligaya",1],["phinayi",1],["racheldesiree",1],["rhmanton94",1],["sarahsartjourney_",1],["shanna.cards",1],["soapmachi",1],["storm.wolf.journals",1],["taileyh",1],["tokkidum",1],["uniquinn_alleyne",1],["vero_disco",1],["yenne.studios",1],["zuzubeanart",1]];
+
+  var SEED = {
+    entrants: SEED_ENTRANTS,
+    winners: 3,
+    eyebrow: "2,000 followers · thank you",
+    subline: "@supersweetbyqiao — September Sweet Mail giveaway",
+    slots: "September Sweet Mail — winners",
+    note: "267 entries from 83 accounts, 2026-08-25 to 2026-08-31. Inside the 31 August, 11:59 PM PT deadline. Replies are excluded. Tagging the same friend twice does not earn a second entry. Each qualifying comment counts as one entry."
+  };
 
   var CANDY = ["#FF6F9C","#FF8A5B","#FFB13D","#FFD84D","#B7D94C","#4FC98A",
                "#35BFC0","#43A7E8","#7B8FEC","#A97CE6","#DE6FCB","#D9926B"];
-  var INK = "#3B2340", PAPER = "#FFFFFF", GROUND = "#FFF6F2";
-  var TOTAL_WINNERS = 3;
+  var INK = "#3B2340", GROUND = "#FFF6F2";
 
-  /* Seat entrants around the rim at a golden-angle stride so the widest
-     wedges land evenly spaced instead of bunching into one fat arc.
-     83 is prime, so every stride is coprime with it and every slot fills. */
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ================= state ================= */
+  var ALL = [], pool = [], winners = [], segs = [];
+  var totalWinners = 3;
+  var rot = -Math.PI/2;
+  var spinning = false, building = false;
+  var buildT = null;            /* 0..1 while names fly onto the wheel */
+  var pendingRemoval = null, highlight = null;
+  var soundOn = true;
+  var redacted = null;          /* {entrants:[], rows:[] } for CSV export */
+  var noteText = SEED.note;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var cv = $("wheel"), ctx = cv.getContext("2d");
+  var needle = $("needle"), banner = $("banner");
+  var hub = $("hub"), hublab = $("hublab"), hubnum = $("hubnum");
+  var spinBtn = $("spinBtn"), stampsEl = $("stamps"), gridEl = $("grid");
+
+  /* ================= seating ================= */
+  function gcd(a,b){ while(b){ var t=a%b; a=b; b=t; } return a; }
+  /* Seat entrants at a golden-angle stride so the widest wedges land evenly
+     spaced around the rim instead of bunching into one fat arc. */
   function seat(list){
     var n = list.length;
+    if(n < 3) return list.slice();
     var stride = Math.max(1, Math.round(n / 1.6180339887));
+    while(gcd(stride, n) !== 1) stride++;
+    if(stride >= n) stride = 1;
     var out = new Array(n);
     for(var i=0;i<n;i++) out[(i * stride) % n] = list[i];
     return out;
   }
 
-  var ALL = seat(RAW.map(function(r,i){ return {u:r[0], n:r[1], rank:i}; }))
-              .map(function(e,i){ e.color = CANDY[i % CANDY.length]; return e; });
+  function load(entrants, winnerCount){
+    var sorted = entrants.slice().sort(function(a,b){
+      return b[1] - a[1] || (a[0] < b[0] ? -1 : 1);
+    });
+    ALL = seat(sorted.map(function(r,i){ return {u:r[0], n:r[1], rank:i}; }))
+            .map(function(e,i){ e.color = CANDY[i % CANDY.length]; return e; });
+    totalWinners = Math.max(1, Math.min(winnerCount || 3, ALL.length));
+    pool = ALL.slice();
+    winners = [];
+    pendingRemoval = null; highlight = null;
+    segs = slices();
+    rot = -Math.PI/2;
+  }
 
-  var pool = ALL.slice();
-  var winners = [];
-  var rot = -Math.PI/2;            // current wheel rotation
-  var spinning = false;
-  var pendingRemoval = null;       // winner still shown on the wheel
-  var highlight = null;            // entrant object to emphasise
-  var soundOn = true;
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  var cv = document.getElementById("wheel"), ctx = cv.getContext("2d");
-  var needle = document.getElementById("needle");
-  var banner = document.getElementById("banner");
-  var hub = document.getElementById("hub"), hubnum = document.getElementById("hubnum");
-  var spinBtn = document.getElementById("spinBtn");
-  var stampsEl = document.getElementById("stamps");
-  var gridEl = document.getElementById("grid");
-
-  /* ---------- geometry ---------- */
   function slices(){
     var total = 0, i;
     for(i=0;i<pool.length;i++) total += pool[i].n;
     var out = [], a = 0;
+    if(!total) return out;
     for(i=0;i<pool.length;i++){
       var span = pool[i].n / total * Math.PI * 2;
       out.push({e:pool[i], a0:a, a1:a+span, span:span});
@@ -446,14 +566,16 @@
     }
     return out;
   }
-  var segs = slices();
 
+  function entryTotal(list){
+    var t = 0; for(var i=0;i<list.length;i++) t += list[i].n; return t;
+  }
+
+  /* ================= painting ================= */
   function dark(hex){
     var r=parseInt(hex.substr(1,2),16), g=parseInt(hex.substr(3,2),16), b=parseInt(hex.substr(5,2),16);
     return (0.299*r + 0.587*g + 0.114*b) < 150;
   }
-
-  /* ---------- painting ---------- */
   function size(){
     var box = cv.parentNode.getBoundingClientRect();
     var css = Math.max(240, Math.min(box.width, 620));
@@ -468,15 +590,14 @@
     var css = size();
     var cx = css/2, cy = css/2;
     var R = css/2 - 16;
+    var hubR = css * 0.12;
     ctx.clearRect(0,0,css,css);
 
-    /* rim */
     ctx.beginPath(); ctx.arc(cx,cy,R+9,0,Math.PI*2);
     ctx.fillStyle = INK; ctx.fill();
     ctx.beginPath(); ctx.arc(cx,cy,R+4.5,0,Math.PI*2);
     ctx.fillStyle = GROUND; ctx.fill();
 
-    /* perforation dots around the rim, like stamp edging */
     var dots = 72;
     for(var d=0; d<dots; d++){
       var ang = d/dots*Math.PI*2 + rot*0.25;
@@ -485,10 +606,23 @@
       ctx.fillStyle = INK; ctx.globalAlpha = .5; ctx.fill(); ctx.globalAlpha = 1;
     }
 
-    for(var i=0;i<segs.length;i++){
+    var n = segs.length;
+    for(var i=0;i<n;i++){
       var s = segs[i];
+
+      /* build-in progress for this wedge */
+      var p = 1;
+      if(buildT !== null){
+        var start = (i / Math.max(1,n)) * 0.55;
+        p = (buildT - start) / 0.45;
+        if(p <= 0) continue;
+        if(p > 1) p = 1;
+      }
+      var grow = 1 - Math.pow(1 - p, 3);
+
       var isHit = highlight && s.e === highlight;
-      var rr = isHit ? R + 4 : R;
+      var rr = (isHit ? R + 4 : R) * grow;
+      if(rr < 1) continue;
 
       ctx.save();
       ctx.globalAlpha = (highlight && !isHit) ? 0.42 : 1;
@@ -501,22 +635,25 @@
       ctx.lineWidth = 1.2;
       ctx.strokeStyle = "rgba(255,255,255,.85)";
       ctx.stroke();
-      if(isHit){
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = INK;
-        ctx.stroke();
-      }
+      if(isHit){ ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke(); }
       ctx.restore();
 
-      /* label, only where the wedge can hold one */
       var deg = s.span * 180 / Math.PI;
       if(deg >= 3.4){
+        /* the name flies out from the hub and sticks to its wedge */
+        var lp = buildT === null ? 1 : Math.max(0, Math.min(1, (p - 0.35) / 0.65));
+        if(lp <= 0) continue;
+        var ease = 1 - Math.pow(1 - lp, 3);
+        var edge = (isHit ? R + 4 : R);
+        var radius = hubR + (edge - 12 - hubR) * ease;
+
         var fs = Math.max(9, Math.min(17, deg * 0.95)) * (css/620);
-        fs = Math.max(7.5, fs);
+        fs = Math.max(7.5, fs) * (0.8 + 0.2*ease);
+
         var mid = (s.a0 + s.a1)/2 + rot;
-        var flipped = Math.cos(mid) < 0;   /* keep left-hand labels upright */
+        var flipped = Math.cos(mid) < 0;
         ctx.save();
-        ctx.globalAlpha = (highlight && !isHit) ? 0.42 : 1;
+        ctx.globalAlpha = ((highlight && !isHit) ? 0.42 : 1) * lp;
         ctx.translate(cx,cy);
         ctx.rotate(flipped ? mid + Math.PI : mid);
         ctx.textAlign = flipped ? "left" : "right";
@@ -524,34 +661,98 @@
         ctx.font = (isHit ? "700 " : "400 ") + fs.toFixed(1) + 'px "Space Mono", ui-monospace, monospace';
         ctx.fillStyle = dark(s.e.color) ? "#FFFFFF" : INK;
         var label = s.e.u;
-        var room = rr * 0.68;
-        while(ctx.measureText(label).width > room && label.length > 4){
-          label = label.slice(0, -2);
-        }
+        var room = edge * 0.68;
+        while(ctx.measureText(label).width > room && label.length > 4) label = label.slice(0, -2);
         if(label !== s.e.u) label += "…";
-        ctx.fillText(label, flipped ? -(rr - 12) : (rr - 12), 0);
+        ctx.fillText(label, flipped ? -radius : radius, 0);
         ctx.restore();
       }
     }
   }
 
-  /* ---------- audio ---------- */
-  var actx = null;
+  /* ================= audio ================= */
+  /* A real prize wheel is a rubber pointer slapping wooden pegs: a filtered
+     noise burst for the slap, a short damped tone for the body of the peg,
+     both randomised and quieter as the wheel loses speed. */
+  var actx = null, master = null, noiseBuf = null;
   function ac(){
-    if(!actx && window.AudioContext) actx = new AudioContext();
+    if(!actx && (window.AudioContext || window.webkitAudioContext)){
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      master = actx.createGain();
+      master.gain.value = 0.9;
+      master.connect(actx.destination);
+    }
     if(actx && actx.state === "suspended") actx.resume();
     return actx;
   }
-  function tick(){
+  function noise(a){
+    if(noiseBuf) return noiseBuf;
+    var len = Math.floor(a.sampleRate * 0.2);
+    noiseBuf = a.createBuffer(1, len, a.sampleRate);
+    var d = noiseBuf.getChannelData(0);
+    for(var i=0;i<len;i++) d[i] = (Math.random()*2 - 1) * (1 - i/len);
+    return noiseBuf;
+  }
+
+  function tick(vel){
     if(!soundOn || reduced) return;
     var a = ac(); if(!a) return;
-    var o = a.createOscillator(), g = a.createGain();
-    o.type = "triangle"; o.frequency.value = 1320;
-    g.gain.setValueAtTime(.10, a.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001, a.currentTime + .035);
-    o.connect(g); g.connect(a.destination);
-    o.start(); o.stop(a.currentTime + .04);
+    var t = a.currentTime;
+    var v = 0.22 + 0.78 * Math.max(0, Math.min(1, vel));
+    var jit = 0.82 + Math.random()*0.36;
+
+    /* slap */
+    var src = a.createBufferSource();
+    src.buffer = noise(a);
+    src.playbackRate.value = 0.75 + Math.random()*0.6;
+    var bp = a.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = (1250 + Math.random()*850) * (0.72 + 0.4*v);
+    bp.Q.value = 1.4 + Math.random()*1.4;
+    var hp = a.createBiquadFilter();
+    hp.type = "highpass"; hp.frequency.value = 380;
+    var g = a.createGain();
+    var dur = 0.038 + Math.random()*0.024;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, 0.20*v*jit), t + 0.0022);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + dur + 0.02);
+
+    /* wooden body */
+    var o = a.createOscillator();
+    o.type = "triangle";
+    var f0 = 170 + Math.random()*80;
+    o.frequency.setValueAtTime(f0 * 1.7, t);
+    o.frequency.exponentialRampToValueAtTime(f0, t + 0.028);
+    var lp = a.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 1100;
+    var g2 = a.createGain();
+    g2.gain.setValueAtTime(0.0001, t);
+    g2.gain.exponentialRampToValueAtTime(Math.max(0.0002, 0.115*v*jit), t + 0.004);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
+    o.connect(lp); lp.connect(g2); g2.connect(master);
+    o.start(t); o.stop(t + 0.08);
   }
+
+  /* paper being stuck onto the wheel during the import build */
+  function paperTick(){
+    if(!soundOn || reduced) return;
+    var a = ac(); if(!a) return;
+    var t = a.currentTime;
+    var src = a.createBufferSource();
+    src.buffer = noise(a);
+    src.playbackRate.value = 1.6 + Math.random()*0.9;
+    var bp = a.createBiquadFilter();
+    bp.type = "bandpass"; bp.frequency.value = 3200 + Math.random()*2200; bp.Q.value = 0.9;
+    var g = a.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.035, t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+    src.connect(bp); bp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + 0.09);
+  }
+
   function chime(){
     if(!soundOn) return;
     var a = ac(); if(!a) return;
@@ -563,13 +764,13 @@
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(.16, t + .02);
       g.gain.exponentialRampToValueAtTime(.001, t + .6);
-      o.connect(g); g.connect(a.destination);
+      o.connect(g); g.connect(master);
       o.start(t); o.stop(t + .62);
     });
   }
 
-  /* ---------- confetti ---------- */
-  var conf = document.getElementById("confetti"), cctx = conf.getContext("2d");
+  /* ================= confetti ================= */
+  var conf = $("confetti"), cctx = conf.getContext("2d");
   var bits = [], confRAF = null;
   function fitConf(){
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -583,13 +784,10 @@
     var ox = box.left + box.width/2, oy = box.top + box.height/2;
     for(var i=0;i<170;i++){
       var ang = Math.random()*Math.PI*2, sp = 5 + Math.random()*13;
-      bits.push({
-        x:ox, y:oy,
-        vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 5,
+      bits.push({x:ox, y:oy, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 5,
         w:5 + Math.random()*7, h:8 + Math.random()*9,
         r:Math.random()*Math.PI, vr:(Math.random()-.5)*.32,
-        c:CANDY[(Math.random()*CANDY.length)|0], life:1
-      });
+        c:CANDY[(Math.random()*CANDY.length)|0], life:1});
     }
     if(!confRAF) confRAF = requestAnimationFrame(stepConf);
   }
@@ -607,11 +805,11 @@
       cctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
       cctx.restore();
     }
-    if(bits.length){ confRAF = requestAnimationFrame(stepConf); }
+    if(bits.length) confRAF = requestAnimationFrame(stepConf);
     else { confRAF = null; cctx.clearRect(0,0,innerWidth,innerHeight); }
   }
 
-  /* ---------- random ---------- */
+  /* ================= random ================= */
   function rand(){
     if(window.crypto && crypto.getRandomValues){
       var u = new Uint32Array(1); crypto.getRandomValues(u);
@@ -619,46 +817,58 @@
     }
     return Math.random();
   }
-  function drawWinner(){
-    var total = 0, i;
-    for(i=0;i<pool.length;i++) total += pool[i].n;
+  function pickWinner(){
+    var total = entryTotal(pool);
     var t = rand() * total, acc = 0;
-    for(i=0;i<pool.length;i++){
+    for(var i=0;i<pool.length;i++){
       acc += pool[i].n;
       if(t < acc) return pool[i];
     }
     return pool[pool.length-1];
   }
 
-  /* ---------- UI shells ---------- */
+  /* ================= chrome ================= */
+  function say(html){ banner.innerHTML = html; }
+  function msg(text){ say('<span class="msg">' + text + '</span>'); }
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function toast(text){
+    var el = document.createElement("div");
+    el.className = "toast"; el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 2600);
+  }
+
   function renderStamps(){
     var html = "";
-    for(var i=0;i<TOTAL_WINNERS;i++){
+    for(var i=0;i<totalWinners;i++){
       var w = winners[i];
       if(w){
         html += '<div class="stamp filled' + (i === winners.length-1 ? ' landing' : '') + '">' +
           '<div class="inner"><div class="no">' + (i+1) + '</div>' +
-          '<div class="who"><span class="name">@' + w.u + '</span>' +
+          '<div class="who"><span class="name">@' + esc(w.u) + '</span>' +
           '<span class="meta">' + w.n + (w.n === 1 ? ' entry' : ' entries') + ' · ' + w.pct + '% of the drum</span></div></div>' +
           '<svg class="postmark" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">' +
             '<circle cx="28" cy="28" r="24" fill="none" stroke="#2F5FC4" stroke-width="2"/>' +
             '<circle cx="28" cy="28" r="19" fill="none" stroke="#2F5FC4" stroke-width="1"/>' +
-            '<text x="28" y="25" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">SEP 2026</text>' +
+            '<text x="28" y="25" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">DRAWN</text>' +
             '<text x="28" y="36" text-anchor="middle" font-family="Space Mono, monospace" font-size="7.5" fill="#2F5FC4">SWEET MAIL</text>' +
           '</svg></div>';
       } else {
         html += '<div class="stamp empty"><div class="inner"><div class="no">' + (i+1) + '</div>' +
           '<div class="who"><span class="name">awaiting the spin</span>' +
-          '<span class="meta">winner ' + (i+1) + ' of 3</span></div></div></div>';
+          '<span class="meta">winner ' + (i+1) + ' of ' + totalWinners + '</span></div></div></div>';
       }
     }
     stampsEl.innerHTML = html;
   }
 
   function renderGrid(){
-    var won = {}, i;
+    var won = {}, live = {}, i;
     for(i=0;i<winners.length;i++) won[winners[i].u] = true;
-    var live = {};
     for(i=0;i<pool.length;i++) live[pool[i].u] = true;
     var byRank = ALL.slice().sort(function(a,b){ return a.rank - b.rank; });
     var html = "";
@@ -666,26 +876,69 @@
       var e = byRank[i];
       var cls = won[e.u] ? "ent won" : (live[e.u] ? "ent" : "ent out");
       html += '<div class="' + cls + '"><span class="chip" style="background:' + e.color + '"></span>' +
-              '<span class="h">@' + e.u + '</span><span class="c">' + e.n + '</span></div>';
+              '<span class="h">@' + esc(e.u) + '</span><span class="c">' + e.n + '</span></div>';
     }
     gridEl.innerHTML = html;
   }
 
-  function say(html){ banner.innerHTML = html; }
-  function msg(text){ say('<span class="msg">' + text + '</span>'); }
+  function renderFacts(){
+    $("fEntries").textContent = entryTotal(ALL);
+    $("fEntrants").textContent = ALL.length;
+    $("fWinners").textContent = totalWinners;
+  }
+
+  function renderFineprint(){
+    $("fineprint").innerHTML =
+      "<b>How this draw works.</b> " + esc(noteText) + " Each winner is chosen first by the browser’s " +
+      "cryptographic random number generator, weighted by entry count; the wheel then spins to that result. " +
+      "A winner leaves the pool before the next spin, so all " + totalWinners + " winners are different people.";
+  }
 
   function updateHub(){
-    var next = winners.length + 1;
-    if(winners.length >= TOTAL_WINNERS){
-      hub.querySelector(".lab").textContent = "Done";
-      hubnum.innerHTML = '3<span style="font-size:.5em">/3</span>';
+    if(building){ hublab.textContent = "Loading"; return; }
+    if(winners.length >= totalWinners){
+      hublab.textContent = "Done";
+      hubnum.innerHTML = totalWinners + '<span style="font-size:.5em">/' + totalWinners + '</span>';
     } else {
-      hub.querySelector(".lab").textContent = "Draw";
-      hubnum.innerHTML = next + '<span style="font-size:.5em">/3</span>';
+      hublab.textContent = "Draw";
+      hubnum.innerHTML = (winners.length + 1) + '<span style="font-size:.5em">/' + totalWinners + '</span>';
     }
   }
 
-  /* ---------- the spin ---------- */
+  function readyMsg(){
+    msg("Ready — " + ALL.length + " entrants, " + entryTotal(ALL) + " entries in the drum");
+  }
+
+  /* ================= build-in animation ================= */
+  function playBuild(then){
+    if(reduced){ buildT = null; paint(); if(then) then(); return; }
+    building = true;
+    buildT = 0;
+    spinBtn.disabled = true;
+    hublab.textContent = "Loading";
+    var t0 = performance.now(), dur = 2400;
+    var lastSounded = -1;
+    var count = ALL.length, shown = 0;
+    function frame(now){
+      var t = Math.min(1, (now - t0) / dur);
+      buildT = t;
+      paint();
+      shown = Math.round(Math.min(1, t/0.8) * count);
+      hubnum.innerHTML = shown;
+      var step = Math.floor(t * 22);
+      if(step !== lastSounded){ lastSounded = step; paperTick(); }
+      if(t < 1) requestAnimationFrame(frame);
+      else {
+        buildT = null; building = false;
+        spinBtn.disabled = false;
+        updateHub(); paint();
+        if(then) then();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ================= the spin ================= */
   var lastIdx = -1;
   function segAtPointer(){
     var base = ((-Math.PI/2 - rot) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
@@ -696,20 +949,20 @@
   }
 
   function spin(){
-    if(spinning || winners.length >= TOTAL_WINNERS) return;
+    if(spinning || building || winners.length >= totalWinners || !pool.length) return;
 
     if(pendingRemoval){
       pool = pool.filter(function(e){ return e !== pendingRemoval; });
-      pendingRemoval = null;
-      highlight = null;
+      pendingRemoval = null; highlight = null;
       segs = slices();
       renderGrid();
     }
     highlight = null;
 
-    var winner = drawWinner();
+    var winner = pickWinner();
     var seg = null;
     for(var i=0;i<segs.length;i++) if(segs[i].e === winner) seg = segs[i];
+    if(!seg) return;
 
     var inside = seg.a0 + seg.span * (0.18 + rand() * 0.64);
     var turns = reduced ? 2 : (5 + Math.floor(rand()*3));
@@ -719,11 +972,12 @@
     var from = rot;
     var dur = reduced ? 1400 : 7200;
     var t0 = performance.now();
+    var peak = 4.1 * delta / dur;      /* d/dt of the easing at t=0 */
 
     spinning = true;
     spinBtn.disabled = true;
     hub.classList.add("busy");
-    msg("Spinning for winner " + (winners.length + 1) + " of 3…");
+    msg("Spinning for winner " + (winners.length + 1) + " of " + totalWinners + "…");
     lastIdx = segAtPointer();
 
     function frame(now){
@@ -731,10 +985,11 @@
       var e = 1 - Math.pow(1 - t, 4.1);
       rot = from + delta * e;
       paint();
+      var speed = 4.1 * delta * Math.pow(1 - t, 3.1) / dur;
       var idx = segAtPointer();
       if(idx !== lastIdx){
         lastIdx = idx;
-        tick();
+        tick(peak ? speed / peak : 0.5);
         needle.classList.remove("knock");
         void needle.offsetWidth;
         needle.classList.add("knock");
@@ -752,26 +1007,21 @@
     highlight = winner;
     pendingRemoval = winner;
 
-    var total = 0;
-    for(var i=0;i<pool.length;i++) total += pool[i].n;
-    winner.pct = (winner.n / total * 100).toFixed(1);
-
+    winner.pct = (winner.n / entryTotal(pool) * 100).toFixed(1);
     winners.push(winner);
-    paint();
-    renderStamps();
-    renderGrid();
-    updateHub();
-    burst();
-    chime();
 
-    say('<span class="hit"><i>Winner ' + winners.length + ' of 3</i><b>@' + winner.u + '</b></span>');
+    paint(); renderStamps(); renderGrid(); updateHub();
+    burst(); chime();
 
-    if(winners.length >= TOTAL_WINNERS){
-      spinBtn.textContent = "All three drawn";
+    say('<span class="hit"><i>Winner ' + winners.length + ' of ' + totalWinners +
+        '</i><b>@' + esc(winner.u) + '</b></span>');
+
+    if(winners.length >= totalWinners){
+      spinBtn.textContent = totalWinners === 1 ? "Winner drawn" : "All " + totalWinners + " drawn";
       spinBtn.disabled = true;
       setTimeout(function(){
         say('<span class="hit"><i>Congratulations</i><b>' +
-            winners.map(function(w){ return "@" + w.u; }).join(" · ") + '</b></span>');
+            winners.map(function(w){ return "@" + esc(w.u); }).join(" · ") + '</b></span>');
       }, 2600);
     } else {
       spinBtn.disabled = false;
@@ -779,49 +1029,448 @@
     }
   }
 
-  /* ---------- controls ---------- */
-  spinBtn.addEventListener("click", spin);
+  function resetDraw(){
+    if(spinning || building) return;
+    pool = ALL.slice();
+    winners = []; pendingRemoval = null; highlight = null;
+    segs = slices();
+    rot = -Math.PI/2;
+    spinBtn.disabled = false;
+    spinBtn.textContent = "Spin the wheel";
+    readyMsg(); updateHub(); renderStamps(); renderGrid(); paint();
+  }
 
-  document.addEventListener("keydown", function(ev){
-    if(ev.code === "Space" || ev.key === " "){
-      if(document.activeElement && document.activeElement.tagName === "BUTTON" &&
-         document.activeElement !== spinBtn) return;
-      ev.preventDefault();
-      spin();
+  /* ================= CSV in ================= */
+  function parseCSV(text){
+    text = text.replace(/^﻿/, "");
+    var rows = [], row = [], f = "", q = false, i = 0, c;
+    while(i < text.length){
+      c = text.charAt(i);
+      if(q){
+        if(c === '"'){
+          if(text.charAt(i+1) === '"'){ f += '"'; i += 2; continue; }
+          q = false; i++; continue;
+        }
+        f += c; i++; continue;
+      }
+      if(c === '"'){ q = true; i++; continue; }
+      if(c === ','){ row.push(f); f = ""; i++; continue; }
+      if(c === '\r'){ i++; continue; }
+      if(c === '\n'){ row.push(f); rows.push(row); row = []; f = ""; i++; continue; }
+      f += c; i++;
     }
+    if(f.length || row.length){ row.push(f); rows.push(row); }
+    return rows.filter(function(r){ return r.length > 1 || (r[0] && r[0].trim() !== ""); });
+  }
+
+  function findCol(headers, names){
+    var i, j, h;
+    for(j=0;j<names.length;j++){
+      for(i=0;i<headers.length;i++){
+        h = headers[i].trim().toLowerCase();
+        if(h === names[j]) return i;
+      }
+    }
+    for(j=0;j<names.length;j++){
+      for(i=0;i<headers.length;i++){
+        h = headers[i].trim().toLowerCase();
+        if(h.indexOf(names[j]) !== -1) return i;
+      }
+    }
+    return -1;
+  }
+
+  var parsed = null;   /* {headers, rows, cols} */
+
+  function analyse(text){
+    var rows = parseCSV(text);
+    if(rows.length < 2) throw new Error("That file has no data rows.");
+    var headers = rows[0];
+    var cols = {
+      user: findCol(headers, ["username","user","owner","author","handle","commenter","from"]),
+      type: findCol(headers, ["type","kind"]),
+      tags: findCol(headers, ["tagged_accounts","tagged","mentions","tags"]),
+      tagCount: findCol(headers, ["tag_count","tags_count"]),
+      text: findCol(headers, ["comment","text","message","body","caption"]),
+      time: findCol(headers, ["timestamp_pt","timestamp_utc","timestamp","time","date","created"])
+    };
+    if(cols.user === -1) throw new Error("No username column found. Expected one named username, user, author or handle.");
+    return {headers:headers, rows:rows.slice(1), cols:cols};
+  }
+
+  function tagsOf(row, cols){
+    var raw = "";
+    if(cols.tags !== -1) raw = row[cols.tags] || "";
+    else if(cols.text !== -1) raw = row[cols.text] || "";
+    var out = [], m, re = /@([A-Za-z0-9._]+)/g;
+    while((m = re.exec(raw))) out.push(m[1].toLowerCase().replace(/\.+$/, ""));
+    return out;
+  }
+
+  function tally(p, opts){
+    var cols = p.cols, counts = {}, seenPair = {}, kept = [], i, j;
+    var host = (opts.host || "").trim().toLowerCase().replace(/^@/, "");
+    var drop = {replies:0, noTag:0, dupTag:0, self:0, host:0, blank:0};
+
+    for(i=0;i<p.rows.length;i++){
+      var row = p.rows[i];
+      var user = (row[cols.user] || "").trim().replace(/^@/, "");
+      if(!user){ drop.blank++; continue; }
+      var lower = user.toLowerCase();
+
+      if(opts.topLevelOnly && cols.type !== -1){
+        var ty = (row[cols.type] || "").trim().toLowerCase();
+        if(ty && ty !== "comment"){ drop.replies++; continue; }
+      }
+
+      var tags = tagsOf(row, cols);
+      if(host && lower === host){ drop.host++; continue; }
+      tags = tags.filter(function(t){ return t !== host; });
+      var selfTagged = tags.indexOf(lower) !== -1;
+      tags = tags.filter(function(t){ return t !== lower; });
+
+      if(opts.requireTag && cols.tags === -1 && cols.text === -1){
+        /* no column to check against — cannot enforce, so don't */
+      } else if(opts.requireTag && !tags.length){
+        if(selfTagged) drop.self++; else drop.noTag++;
+        continue;
+      }
+
+      if(opts.uniqueTags && tags.length){
+        var fresh = false;
+        for(j=0;j<tags.length;j++){
+          var key = lower + " " + tags[j];
+          if(!seenPair[key]){ seenPair[key] = 1; fresh = true; }
+        }
+        if(!fresh){ drop.dupTag++; continue; }
+      }
+
+      counts[user] = (counts[user] || 0) + 1;
+      kept.push({user:user, type:cols.type !== -1 ? (row[cols.type] || "") : "comment",
+                 tagCount:tags.length,
+                 time:cols.time !== -1 ? (row[cols.time] || "") : ""});
+    }
+
+    var entrants = Object.keys(counts).map(function(u){
+      return [u, opts.perComment ? counts[u] : 1];
+    });
+    return {entrants:entrants, kept:kept, drop:drop, comments:kept.length};
+  }
+
+  /* ================= redacted CSV out ================= */
+  function csvCell(v){
+    v = v == null ? "" : String(v);
+    return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+  }
+  function buildRedacted(result){
+    var total = 0, i;
+    var counts = {};
+    for(i=0;i<result.entrants.length;i++){ counts[result.entrants[i][0]] = result.entrants[i][1]; total += result.entrants[i][1]; }
+
+    var a = ["username,entries,share_pct"];
+    result.entrants.slice().sort(function(x,y){ return y[1]-x[1] || (x[0]<y[0]?-1:1); })
+      .forEach(function(r){
+        a.push([csvCell(r[0]), r[1], (r[1]/total*100).toFixed(2)].join(","));
+      });
+
+    var b = ["type,username,tag_count,timestamp"];
+    for(i=0;i<result.kept.length;i++){
+      var k = result.kept[i];
+      b.push([csvCell(k.type), csvCell(k.user), k.tagCount, csvCell(k.time)].join(","));
+    }
+    return {entrants:a.join("\n") + "\n", rows:b.join("\n") + "\n"};
+  }
+
+  function download(name, text){
+    var blob = new Blob([text], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text);
+    }
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); } catch(e){}
+    ta.remove();
+    return Promise.resolve();
+  }
+
+  function seedRedacted(){
+    var a = ["username,entries,share_pct"], total = entryTotal(ALL);
+    ALL.slice().sort(function(x,y){ return y.n-x.n || (x.u<y.u?-1:1); }).forEach(function(e){
+      a.push([csvCell(e.u), e.n, (e.n/total*100).toFixed(2)].join(","));
+    });
+    return {entrants:a.join("\n") + "\n", rows:null};
+  }
+
+  $("dlBtn").addEventListener("click", function(){
+    var r = redacted || seedRedacted();
+    var ok = false;
+    try{
+      download("entrants.csv", r.entrants);
+      if(r.rows) download("entries-redacted.csv", r.rows);
+      ok = true;
+    } catch(e){ ok = false; }
+    /* Downloads are blocked inside some embedded viewers — always leave a copy
+       on the clipboard so the data is recoverable either way. */
+    copyText(r.entrants).then(function(){
+      toast(ok ? "Downloaded — also copied to your clipboard" : "Copied to your clipboard");
+    });
   });
 
-  document.getElementById("soundBtn").addEventListener("click", function(){
+  /* ================= import sheet ================= */
+  var veil = null;
+
+  function openSheet(){
+    if(veil) return;
+    parsed = null;
+    veil = document.createElement("div");
+    veil.className = "veil";
+    veil.innerHTML =
+      '<div class="sheet" role="dialog" aria-modal="true" aria-label="Import a CSV">' +
+        '<h2>Load a new draw</h2>' +
+        '<p class="lede">Drop in a comment export and the wheel rebuilds itself around it. ' +
+          'Nothing leaves your browser — the file is read locally, and only the redacted ' +
+          'columns can be exported.</p>' +
+
+        '<label class="drop" id="drop" tabindex="0">' +
+          '<span class="big">Drop your CSV here</span>' +
+          '<span class="small">or click to choose a file</span>' +
+          '<input type="file" id="file" accept=".csv,text/csv" hidden>' +
+        '</label>' +
+
+        '<div id="report" hidden></div>' +
+
+        '<div class="actions">' +
+          '<button class="go" id="goBtn" disabled>Build the wheel</button>' +
+          '<button class="mini" id="cancelBtn">Cancel</button>' +
+          '<span class="note" id="sheetNote">Needs a column of usernames. A <code>type</code> ' +
+            'column lets replies be filtered out; a tags or comment column lets the @-mention ' +
+            'rules apply.</span>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(veil);
+
+    var drop = veil.querySelector("#drop");
+    var file = veil.querySelector("#file");
+
+    drop.addEventListener("click", function(){ file.click(); });
+    drop.addEventListener("keydown", function(ev){
+      if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); file.click(); }
+    });
+    file.addEventListener("change", function(){
+      if(file.files && file.files[0]) readFile(file.files[0]);
+    });
+    ["dragenter","dragover"].forEach(function(ev){
+      drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add("over"); });
+    });
+    ["dragleave","drop"].forEach(function(ev){
+      drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove("over"); });
+    });
+    drop.addEventListener("drop", function(e){
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(f) readFile(f);
+    });
+
+    veil.querySelector("#cancelBtn").addEventListener("click", closeSheet);
+    veil.addEventListener("mousedown", function(e){ if(e.target === veil) closeSheet(); });
+    document.addEventListener("keydown", escClose);
+    veil.querySelector("#goBtn").addEventListener("click", commitImport);
+  }
+
+  function escClose(ev){ if(ev.key === "Escape") closeSheet(); }
+
+  function closeSheet(){
+    if(!veil) return;
+    document.removeEventListener("keydown", escClose);
+    veil.remove(); veil = null; parsed = null;
+  }
+
+  function readFile(f){
+    var fr = new FileReader();
+    fr.onload = function(){
+      try{
+        parsed = analyse(String(fr.result));
+        parsed.name = f.name;
+        showReport();
+      } catch(err){
+        parsed = null;
+        var rep = veil.querySelector("#report");
+        rep.hidden = false;
+        rep.innerHTML = '<section><h3>Could not read that file</h3>' +
+          '<div class="readout"><div><span class="k">' + esc(f.name) + '</span>' +
+          '<span class="v warn">' + esc(err.message) + '</span></div></div></section>';
+        veil.querySelector("#goBtn").disabled = true;
+      }
+    };
+    fr.onerror = function(){ toast("Could not read that file"); };
+    fr.readAsText(f);
+  }
+
+  function showReport(){
+    var c = parsed.cols, h = parsed.headers;
+    var name = function(i){ return i === -1 ? "—" : h[i]; };
+    var rep = veil.querySelector("#report");
+    rep.hidden = false;
+    rep.innerHTML =
+      '<section><h3>What was found</h3><div class="readout">' +
+        '<div><span class="k">File</span><span class="v">' + esc(parsed.name) + '</span></div>' +
+        '<div><span class="k">Rows</span><span class="v">' + parsed.rows.length + '</span></div>' +
+        '<div><span class="k">Username column</span><span class="v">' + esc(name(c.user)) + '</span></div>' +
+        '<div><span class="k">Type column</span><span class="v' + (c.type === -1 ? ' warn' : '') + '">' + esc(name(c.type)) + '</span></div>' +
+        '<div><span class="k">Tags column</span><span class="v' + (c.tags === -1 && c.text === -1 ? ' warn' : '') + '">' + esc(c.tags !== -1 ? name(c.tags) : name(c.text)) + '</span></div>' +
+        '<div><span class="k">Timestamp column</span><span class="v">' + esc(name(c.time)) + '</span></div>' +
+      '</div></section>' +
+
+      '<section><h3>Entry rules</h3><div class="opts">' +
+        opt("optTop", "Top-level comments only", "Replies are not entries.", c.type !== -1, c.type === -1) +
+        opt("optTag", "Require an @ tag", "A comment must tag at least one friend.", c.tags !== -1 || c.text !== -1, c.tags === -1 && c.text === -1) +
+        opt("optUniq", "One entry per friend tagged", "Tagging the same friend again does not earn another entry.", c.tags !== -1 || c.text !== -1, c.tags === -1 && c.text === -1) +
+        opt("optPer", "Each comment is one entry", "Off: every account gets a single entry regardless of how many times they commented.", true, false) +
+      '</div>' +
+      '<div class="row" style="margin-top:14px">' +
+        '<div class="field"><label for="optHost">Host account to ignore</label>' +
+          '<input type="text" id="optHost" value="supersweetbyqiao" spellcheck="false"></div>' +
+        '<div class="field"><label for="optWin">Winners</label>' +
+          '<input type="number" id="optWin" min="1" max="20" value="3"></div>' +
+      '</div></section>' +
+
+      '<section><h3>Result</h3><div class="readout" id="preview"></div></section>';
+
+    ["optTop","optTag","optUniq","optPer","optHost","optWin"].forEach(function(id){
+      var el = veil.querySelector("#" + id);
+      if(el) el.addEventListener("change", preview);
+      if(el && el.type === "text") el.addEventListener("input", preview);
+    });
+    preview();
+  }
+
+  function opt(id, title, sub, checked, disabled){
+    return '<label class="opt"><input type="checkbox" id="' + id + '"' +
+      (checked ? " checked" : "") + (disabled ? " disabled" : "") + '>' +
+      '<span class="t"><span>' + title + (disabled ? " — not available in this file" : "") + '</span>' +
+      '<small>' + sub + '</small></span></label>';
+  }
+
+  function currentOpts(){
+    var g = function(id){ var el = veil.querySelector("#" + id); return el && !el.disabled && el.checked; };
+    var host = veil.querySelector("#optHost");
+    var win = veil.querySelector("#optWin");
+    return {
+      topLevelOnly: g("optTop"),
+      requireTag: g("optTag"),
+      uniqueTags: g("optUniq"),
+      perComment: g("optPer"),
+      host: host ? host.value : "",
+      winners: win ? Math.max(1, Math.min(20, parseInt(win.value, 10) || 3)) : 3
+    };
+  }
+
+  var lastResult = null;
+  function preview(){
+    if(!parsed) return;
+    var opts = currentOpts();
+    var r = tally(parsed, opts);
+    lastResult = r;
+    var total = 0;
+    for(var i=0;i<r.entrants.length;i++) total += r.entrants[i][1];
+    var d = r.drop;
+    var excluded = [];
+    if(d.replies) excluded.push(d.replies + " replies");
+    if(d.noTag) excluded.push(d.noTag + " with no tag");
+    if(d.dupTag) excluded.push(d.dupTag + " repeat tags");
+    if(d.self) excluded.push(d.self + " self-tags");
+    if(d.host) excluded.push(d.host + " from the host");
+    if(d.blank) excluded.push(d.blank + " blank rows");
+
+    var el = veil.querySelector("#preview");
+    el.innerHTML =
+      '<div><span class="k">Entrants</span><span class="v">' + r.entrants.length + '</span></div>' +
+      '<div><span class="k">Entries</span><span class="v">' + total + '</span></div>' +
+      '<div><span class="k">Excluded</span><span class="v">' + (excluded.length ? esc(excluded.join(", ")) : "nothing") + '</span></div>' +
+      '<div><span class="k">Winners</span><span class="v">' + opts.winners + '</span></div>';
+
+    veil.querySelector("#goBtn").disabled = r.entrants.length < 1;
+  }
+
+  function commitImport(){
+    if(!parsed || !lastResult || !lastResult.entrants.length) return;
+    var opts = currentOpts();
+    var r = lastResult;
+    var fname = parsed.name;
+    redacted = buildRedacted(r);
+
+    var total = 0;
+    for(var i=0;i<r.entrants.length;i++) total += r.entrants[i][1];
+
+    var times = r.kept.map(function(k){ return k.time; }).filter(Boolean).sort();
+    var range = times.length ? (times[0].slice(0,10) + " to " + times[times.length-1].slice(0,10)) : "";
+
+    noteText = total + " " + (opts.perComment ? "entries" : "entrants") + " from " +
+      r.entrants.length + " accounts" + (range ? ", " + range : "") + ", read from " + fname + ". " +
+      (opts.topLevelOnly ? "Replies are excluded. " : "") +
+      (opts.uniqueTags ? "Tagging the same friend twice does not earn a second entry. " : "") +
+      (opts.perComment ? "Each qualifying comment counts as one entry." : "Each account counts once, however many times they commented.");
+
+    $("eyebrow").textContent = "imported draw";
+    $("subline").textContent = fname + " — " + r.entrants.length + " entrants";
+    $("slotsTitle").textContent = "Winners";
+
+    load(r.entrants, opts.winners);
+    closeSheet();
+
+    renderFacts(); renderStamps(); renderGrid(); renderFineprint();
+    spinBtn.textContent = "Spin the wheel";
+    msg("Sticking " + ALL.length + " names to the wheel…");
+    playBuild(function(){
+      readyMsg();
+      toast("Wheel rebuilt from " + fname);
+    });
+  }
+
+  $("importBtn").addEventListener("click", function(){
+    if(spinning || building) return;
+    openSheet();
+  });
+
+  /* ================= wiring ================= */
+  spinBtn.addEventListener("click", spin);
+  $("resetBtn").addEventListener("click", resetDraw);
+  $("soundBtn").addEventListener("click", function(){
     soundOn = !soundOn;
     this.setAttribute("aria-pressed", String(soundOn));
     this.textContent = soundOn ? "Sound on" : "Sound off";
     if(soundOn) ac();
   });
 
-  document.getElementById("resetBtn").addEventListener("click", function(){
-    if(spinning) return;
-    pool = ALL.slice();
-    winners = [];
-    pendingRemoval = null;
-    highlight = null;
-    segs = slices();
-    rot = -Math.PI/2;
-    spinBtn.disabled = false;
-    spinBtn.textContent = "Spin the wheel";
-    msg("Ready — 83 entrants, 267 entries in the drum");
-    updateHub();
-    renderStamps();
-    renderGrid();
-    paint();
+  document.addEventListener("keydown", function(ev){
+    if(veil) return;
+    if(ev.code === "Space" || ev.key === " "){
+      var a = document.activeElement;
+      if(a && a.tagName === "BUTTON" && a !== spinBtn) return;
+      if(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA")) return;
+      ev.preventDefault();
+      spin();
+    }
   });
 
   window.addEventListener("resize", function(){ fitConf(); paint(); });
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
 
-  renderStamps();
-  renderGrid();
-  updateHub();
-  paint();
+  /* ================= boot ================= */
+  $("eyebrow").textContent = SEED.eyebrow;
+  $("subline").textContent = SEED.subline;
+  $("slotsTitle").textContent = SEED.slots;
+  load(SEED.entrants, SEED.winners);
+  renderFacts(); renderStamps(); renderGrid(); renderFineprint();
+  readyMsg(); updateHub(); paint();
 })();
 </script>
 </body>
